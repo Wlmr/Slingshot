@@ -13,6 +13,8 @@ public class PlayerWithGravity : MonoBehaviour {
     private Rigidbody2D trajectoryHelper;
 
     private bool firstBurn = true;
+    private bool firstAfterBurn = false;
+    private bool burning = false;
   //  private bool firstCalc = true;
 
     private Vector2 speed;
@@ -62,7 +64,7 @@ public class PlayerWithGravity : MonoBehaviour {
         transform.localPosition = new Vector2(bodyBeingOrbited.transform.position.x, bodyBeingOrbited.transform.position.y - (rdius));
         playerRigidbody.AddForce(speed/2);        
         Time.timeScale = nrmlTime;       
-        GetSemiMjrAxsLngth();
+        GetSemiMjrAxsPoint();
         orbitalPeriod = 2 * Mathf.PI * (Mathf.Sqrt(Mathf.Pow(rdius, 3) / (grvtyCnst * bodyBeingOrbitedRigidbody.mass)));
         orbitalPeriod /= 2;                                                                         //since speed is only half of what its supposed to 
         DotifyTrjctry();
@@ -79,20 +81,25 @@ public class PlayerWithGravity : MonoBehaviour {
             if (firstBurn){
                 Time.timeScale = nrmlTime/10f;                                    //lerp into slowmotion???
                 firstBurn = false;
+                burning = true;
             }
-            playerRigidbody.AddRelativeForce(Vector2.up * nrmlTime / 3000);
-            speed = playerRigidbody.velocity;
-            DotifyTrjctry();
+            Burn();
         } else {
+            if (burning) {                                                      //checks if last frame was burning
+                burning = false;
+               Debug.Log(CelestialInsideTrajectory());
+            }
             firstBurn = true;
             Time.timeScale = nrmlTime; 
         }     
     }
 
     void Burn() {
+        playerRigidbody.AddRelativeForce(Vector2.up * nrmlTime / 3000);
+        speed = playerRigidbody.velocity;
+        DotifyTrjctry();
 
-        
-        
+
     }
 
     Quaternion Rotate(Rigidbody2D obj) {
@@ -107,28 +114,48 @@ public class PlayerWithGravity : MonoBehaviour {
 
 
     
-    void GetSemiMjrAxsLngth() {
+    Vector3 GetSemiMjrAxsPoint() {
         float length = -1;
+        Vector3 semiMjrAxsPoint = Vector3.zero;
         foreach(Vector3 point in trajectoryPoints){
             float testDistance = Vector2.Distance(point, bodyBeingOrbited.transform.position);
             if (testDistance > length){
                 length = testDistance;
+                semiMjrAxsPoint = point;
             }
         }
-        semiMjrAxisLength = length;
+        return semiMjrAxsPoint;
     }
     
 
 
-    void EstablishNewOrbit() {                                              
+    void TryEstablishNewOrbit() {                                              
         if (CelestialInsideTrajectory()) {
 
         }
     }
 
-
+    Vector3[] GetActiveCelestialsPos() {
+        
+        GameObject[] celestials = GameObject.FindGameObjectsWithTag("celestial");
+        Vector3[] celestialsPos = new Vector3[celestials.Length];
+        for (int i = 0; i < celestials.Length; i++) {
+            celestialsPos[i] = celestials[i].transform.position;
+            }
+        return celestialsPos;
+    }
 
     bool CelestialInsideTrajectory() {
+        Vector3[] celestials = GetActiveCelestialsPos();
+
+        foreach (Vector3 point in celestials) {
+            for(int i = 0; i < trajectoryPoints.Length/2; i++) {
+                if(!((trajectoryPoints[i].x > point.x || trajectoryPoints[i].y > point.y) 
+                    && (trajectoryPoints[trajectoryPoints.Length-i-1].x < point.x || trajectoryPoints[trajectoryPoints.Length-i-1].y < point.y))) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
     
