@@ -23,6 +23,7 @@ public class PlayerWithGravity : MonoBehaviour {
     private float grvtyPull;
     private float orbitalPeriod;
     private float playerWeight;
+    private int trajectoryPointsLength;
     public int maxCount = 1000;
     private int privateMaxCount;
     public int simplify = 10;
@@ -33,6 +34,10 @@ public class PlayerWithGravity : MonoBehaviour {
     private Vector2 directionvectorGrvty;
     private Vector3[] trajectoryPoints;
 
+    //for GetSemiMjrAxsPoint()
+    private int semiMjrAxsPointIndex;
+    private Vector3 semiMjrAxsPoint;
+
     //for Dotify()
     float angle;
     float dt;
@@ -42,6 +47,10 @@ public class PlayerWithGravity : MonoBehaviour {
     Vector3 a;
     float tempAngleSum;
     int step;
+
+    //for CelestialInsideTrajectory()/TryEstablishNewOrbit()
+
+    Vector3 successfulCelestial;
     /*
     TODO:
     
@@ -64,7 +73,7 @@ public class PlayerWithGravity : MonoBehaviour {
         transform.localPosition = new Vector2(bodyBeingOrbited.transform.position.x, bodyBeingOrbited.transform.position.y - (rdius));
         playerRigidbody.AddForce(speed/2);        
         Time.timeScale = nrmlTime;       
-        GetSemiMjrAxsPoint();
+        GetApoapsis();
         orbitalPeriod = 2 * Mathf.PI * (Mathf.Sqrt(Mathf.Pow(rdius, 3) / (grvtyCnst * bodyBeingOrbitedRigidbody.mass)));
         orbitalPeriod /= 2;                                                                         //since speed is only half of what its supposed to 
         DotifyTrjctry();
@@ -80,14 +89,15 @@ public class PlayerWithGravity : MonoBehaviour {
         if (Input.touchCount > 0 || Input.anyKey){
             if (firstBurn){
                 Time.timeScale = nrmlTime/10f;                                    //lerp into slowmotion???
-                firstBurn = false;
+                firstBurn = false;                                                //för att veta när man slutat bränna
                 burning = true;
             }
             Burn();
         } else {
             if (burning) {                                                      //checks if last frame was burning
                 burning = false;
-               Debug.Log(CelestialInsideTrajectory());
+                Debug.Log(CelestialInsideTrajectory());
+                TryEstablishNewOrbit();
             }
             firstBurn = true;
             Time.timeScale = nrmlTime; 
@@ -114,19 +124,31 @@ public class PlayerWithGravity : MonoBehaviour {
 
 
     
-    Vector3 GetSemiMjrAxsPoint() {
+    Vector3 GetApoapsis() {
         float length = -1;
-        Vector3 semiMjrAxsPoint = Vector3.zero;
-        foreach(Vector3 point in trajectoryPoints){
-            float testDistance = Vector2.Distance(point, bodyBeingOrbited.transform.position);
+        Vector3 apoapsisPoint = Vector3.zero;
+            for(int i = 0; i < trajectoryPointsLength; i++) {
+            float testDistance = Vector2.Distance(trajectoryPoints[i], bodyBeingOrbited.transform.position);
             if (testDistance > length){
                 length = testDistance;
-                semiMjrAxsPoint = point;
+                apoapsisPoint = trajectoryPoints[i];
             }
         }
-        return semiMjrAxsPoint;
+        return apoapsisPoint;
     }
-    
+
+    Vector3 GetPeriapsis() {
+        float length = 100000000;
+        Vector3 periapsisPoint = Vector3.zero;
+        for (int i = 0; i < trajectoryPointsLength; i++) {
+            float testDistance = Vector2.Distance(trajectoryPoints[i], bodyBeingOrbited.transform.position);
+            if (testDistance < length) {
+                length = testDistance;
+                periapsisPoint = trajectoryPoints[i];
+            }
+        }
+        return periapsisPoint;
+    }
 
 
     void TryEstablishNewOrbit() {                                              
@@ -145,18 +167,36 @@ public class PlayerWithGravity : MonoBehaviour {
         return celestialsPos;
     }
 
+
+    //fortfarande buggig om celestial är under vad man kommer från
     bool CelestialInsideTrajectory() {
         Vector3[] celestials = GetActiveCelestialsPos();
-
-        foreach (Vector3 point in celestials) {
-            for(int i = 0; i < trajectoryPoints.Length/2; i++) {
-                if(!((trajectoryPoints[i].x > point.x || trajectoryPoints[i].y > point.y) 
-                    && (trajectoryPoints[trajectoryPoints.Length-i-1].x < point.x || trajectoryPoints[trajectoryPoints.Length-i-1].y < point.y))) {
-                    return false;
+        int i = 0;
+        Vector3 last = Vector3.zero;
+        foreach (Vector3 celestial in celestials) {                 
+            foreach (Vector3 trajectoryPoint in trajectoryPoints) {
+                if((trajectoryPoint.y > celestial.y && last.y < celestial.y)||(trajectoryPoint.y < celestial.y && last.y > celestial.y)) {
+                    if (trajectoryPoint.x > celestial.x) {
+                        i++;
+                    } else {
+                        i++;
+                    }
+                } else if((trajectoryPoint.x > celestial.x && last.x < celestial.x)||(trajectoryPoint.x < celestial.x && last.x > celestial.x)) {
+                    if (trajectoryPoint.y > celestial.y) {
+                        i++;
+                    } else {
+                        i++;
+                    }
                 }
+                last = trajectoryPoint;
+                
+            }
+            if (i == 4) {
+                successfulCelestial = celestial;
+                return true;
             }
         }
-        return true;
+        return i==4;
     }
     
     void DotifyTrjctry() {
@@ -182,8 +222,10 @@ public class PlayerWithGravity : MonoBehaviour {
             lastS = s;
             step++;
         }
-        trajectoryLine.SetVertexCount(step/simplify);
-        for(int i = 0; i < step/simplify; i++) {
+        trajectoryPointsLength = step / simplify;
+        trajectoryLine.SetVertexCount(trajectoryPointsLength);
+        
+        for(int i = 0; i < trajectoryPointsLength; i++) {
             trajectoryLine.SetPosition(i, trajectoryPoints[i]);
         }
     }

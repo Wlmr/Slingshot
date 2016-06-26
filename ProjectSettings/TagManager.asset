@@ -8,6 +8,7 @@ TagManager:
   - player
   - blackHole
   - trajectoryHelper
+  - celestial
   layers:
   - Default
   - TransparentFX
