@@ -4,29 +4,25 @@ using System.Collections;
 public class PlayerWithGravity : MonoBehaviour {
 
 
-    public float rdius;
+    public float radius;
 
     private LineRenderer trajectoryLine;
     private GameObject bodyBeingOrbited;
     private Rigidbody2D playerRigidbody;      
     private Rigidbody2D bodyBeingOrbitedRigidbody;
-    private Rigidbody2D trajectoryHelper;
+   
 
     private bool firstBurn = true;
     private bool firstAfterBurn = false;
     private bool burning = false;
-  //  private bool firstCalc = true;
+    private bool firstCalc = true;
 
     private Vector2 speed;
     private float startingVelocity;
     private float semiMjrAxisLength;
     private float grvtyPull;
     private float orbitalPeriod;
-    private float playerWeight;
-    private int trajectoryPointsLength;
-    public int maxCount = 1000;
-    private int privateMaxCount;
-    public int simplify = 10;
+
     public int nrmlTime = 6;
 
     private readonly float grvtyCnst = 0.000001f;
@@ -34,27 +30,46 @@ public class PlayerWithGravity : MonoBehaviour {
     private Vector2 directionvectorGrvty;
     private Vector3[] trajectoryPoints;
 
-    //for GetSemiMjrAxsPoint()
-    private int semiMjrAxsPointIndex;
-    private Vector3 semiMjrAxsPoint;
+    //for Get(apoapsis/periapsis)Point()
+    private int apoapsisPointIndex;
+    private Vector3 apoapsisPoint;
+    
 
     //for Dotify()
-    float angle;
-    float dt;
-    Vector3 s;
-    Vector3 lastS;
-    Vector3 v;
-    Vector3 a;
-    float tempAngleSum;
-    int step;
+    public int simplify = 10;
+    public int maxCount = 1000;
+    private float playerWeight;
+    private int nbrOfTrajectoryPoints;
+    private int privateMaxCount;
+    private float angle;
+    private float dt;
+    private Vector3 s;
+    private Vector3 lastS;
+    private Vector3 v;
+    private Vector3 a;
+    private float tempAngleSum;
+    private int step;
 
     //for CelestialInsideTrajectory()/TryEstablishNewOrbit()
 
-    Vector3 successfulCelestial;
+    GameObject successfulCelestial;
+    Rigidbody2D successfulCelestialRigidBody;
+    bool celestialInside;
+    
+    // int successfulCelestialIndex;
+    GameObject[] celestials;
+
+    //TryEstablishNewOrbit
+
+    float requiredVelocity;
+    Vector3 lastPos;
+    bool awatingTransition = false;
+    int burningPosIndex;
+    int transitionPointIndex;
     /*
     TODO:
+        
     
-    trajectoryTransition — add angle
     change GameObjects to Transform if only used with Transform
     */
 
@@ -67,41 +82,60 @@ public class PlayerWithGravity : MonoBehaviour {
         trajectoryLine = GetComponent<LineRenderer>();
         playerRigidbody = GetComponent<Rigidbody2D>();
         playerWeight = playerRigidbody.mass;
-        //    semiMjrAxisLength = rdius; 
+        //semiMjrAxisLength = rdius; 
         bodyBeingOrbitedRigidbody = bodyBeingOrbited.GetComponent<Rigidbody2D>();
-        speed = Vector2.right * Mathf.Sqrt(grvtyCnst * bodyBeingOrbitedRigidbody.mass / rdius);
-        transform.localPosition = new Vector2(bodyBeingOrbited.transform.position.x, bodyBeingOrbited.transform.position.y - (rdius));
+        speed = Vector2.right * Mathf.Sqrt(grvtyCnst * bodyBeingOrbitedRigidbody.mass / radius);
+        transform.localPosition = new Vector2(bodyBeingOrbited.transform.position.x, bodyBeingOrbited.transform.position.y - (radius));
         playerRigidbody.AddForce(speed/2);        
         Time.timeScale = nrmlTime;       
-        GetApoapsis();
-        orbitalPeriod = 2 * Mathf.PI * (Mathf.Sqrt(Mathf.Pow(rdius, 3) / (grvtyCnst * bodyBeingOrbitedRigidbody.mass)));
-        orbitalPeriod /= 2;                                                                         //since speed is only half of what its supposed to 
+        GetApoapsis(bodyBeingOrbited.transform.position);
+        //orbitalPeriod = 2 * Mathf.PI * (Mathf.Sqrt(Mathf.Pow(rdius, 3) / (grvtyCnst * bodyBeingOrbitedRigidbody.mass)));
+        //orbitalPeriod /= 2;                                                                         //since speed is only half of what its supposed to 
         DotifyTrjctry();
 
     }
 
 
 
-    void FixedUpdate(){
-        
+    void FixedUpdate() {
+
         playerRigidbody.AddForce(GetGravity(playerRigidbody.transform.position));
         transform.rotation = Rotate(playerRigidbody);
-        if (Input.touchCount > 0 || Input.anyKey){
-            if (firstBurn){
-                Time.timeScale = nrmlTime/10f;                                    //lerp into slowmotion???
-                firstBurn = false;                                                //för att veta när man slutat bränna
-                burning = true;
+        if (!awatingTransition) {
+            if ((Input.touchCount > 0 || Input.anyKey)) {
+                if (firstBurn) {
+                    Time.timeScale = nrmlTime / 10f;                                    //lerp into slowmotion???
+                    firstBurn = false;                                                  //för att veta när man slutat bränna
+                    burning = true;
+                    burningPosIndex = GetSmallestDistanceToIndexOnTrajectoryPoints(transform.position);       //funkar ej pga att dotifyTrajectory() uppdaterar punkterna vid varje körning
+                 }
+                if (burning) { Burn(); }
+            } else {
+                if (burning) {                                                          //checks if last frame was burning
+                    burning = false;
+                    awatingTransition = true;
+                    CelestialInsideTrajectory();
+                }
+                firstBurn = true;
+                Time.timeScale = nrmlTime;
             }
-            Burn();
         } else {
-            if (burning) {                                                      //checks if last frame was burning
-                burning = false;
-                Debug.Log(CelestialInsideTrajectory());
-                TryEstablishNewOrbit();
+            
+            if (celestialInside) {
+                GetValuesForEstablishingNewOrbit();
+                EstablishedNewOrbit();
+        }else if(burningPosIndex == GetSmallestDistanceToIndexOnTrajectoryPoints(transform.position)) {
+                //bodyBeingOrbited = successfulCelestial;
+                //bodyBeingOrbitedRigidbody = successfulCelestialRigidBody;
+                Debug.Log("awaitingTrans");
+                playerRigidbody.AddRelativeForce(Vector3.up * (speed.magnitude - GetRequiredVelocity(Vector3.Distance(transform.position, bodyBeingOrbited.transform.position),
+                    bodyBeingOrbitedRigidbody.mass)));
+                DotifyTrjctry();
+                awatingTransition = false;
             }
-            firstBurn = true;
-            Time.timeScale = nrmlTime; 
-        }     
+            //if (transform.position = burningPos //funkar inte eftersom vi inte anväder trajectoryPositions[]                   //BLABLABLAFIXASÅATTDENANVÄNDERESTABLISHNEWORBIT ETC MED HJÄLP AV LASTPOS     
+
+        }
     }
 
     void Burn() {
@@ -110,6 +144,15 @@ public class PlayerWithGravity : MonoBehaviour {
         DotifyTrjctry();
 
 
+    }
+    
+    int getClosestTrajectoryPositionsIndex() {
+        for(int i = 0; i < nbrOfTrajectoryPoints; i++) {
+            Vector3.Distance(transform.position, trajectoryPoints[i]);
+        }
+
+
+        return 1;
     }
 
     Quaternion Rotate(Rigidbody2D obj) {
@@ -122,81 +165,99 @@ public class PlayerWithGravity : MonoBehaviour {
         return directionvectorGrvty.normalized * grvtyCnst * playerWeight * bodyBeingOrbitedRigidbody.mass / directionvectorGrvty.sqrMagnitude;
     }
 
-
-    
-    Vector3 GetApoapsis() {
+   
+    Vector3 GetApoapsis(Vector3 celestial) {
         float length = -1;
         Vector3 apoapsisPoint = Vector3.zero;
-            for(int i = 0; i < trajectoryPointsLength; i++) {
-            float testDistance = Vector2.Distance(trajectoryPoints[i], bodyBeingOrbited.transform.position);
+            for(int i = 0; i < nbrOfTrajectoryPoints; i++) {
+            float testDistance = Vector2.Distance(trajectoryPoints[i], celestial);
             if (testDistance > length){
                 length = testDistance;
-                apoapsisPoint = trajectoryPoints[i];
+                this.apoapsisPoint = trajectoryPoints[i];
             }
         }
         return apoapsisPoint;
     }
-
-    Vector3 GetPeriapsis() {
+    
+    //metoden suger fixa den förhelvete
+    //låt den kolla som EstablishedNewOrbit() gör istället som kollar varje FixedUpdate()
+    int GetSmallestDistanceToIndexOnTrajectoryPoints(Vector3 point) {
         float length = 100000000;
-        Vector3 periapsisPoint = Vector3.zero;
-        for (int i = 0; i < trajectoryPointsLength; i++) {
-            float testDistance = Vector2.Distance(trajectoryPoints[i], bodyBeingOrbited.transform.position);
+        int periapsisPointIndex = -1;
+        for (int i = 0; i < nbrOfTrajectoryPoints; i++) {
+            float testDistance = Vector2.Distance(trajectoryPoints[i], point);
             if (testDistance < length) {
                 length = testDistance;
-                periapsisPoint = trajectoryPoints[i];
+                periapsisPointIndex = i;
             }
         }
-        return periapsisPoint;
+        return periapsisPointIndex;
     }
 
+    float GetRequiredVelocity(float radius, float CelestialMass) {
+        return Mathf.Sqrt(grvtyCnst * CelestialMass / radius);
+    }
 
-    void TryEstablishNewOrbit() {                                              
-        if (CelestialInsideTrajectory()) {
-
+    void GetValuesForEstablishingNewOrbit() {                                              
+        if (celestialInside) {
+            transitionPointIndex = GetSmallestDistanceToIndexOnTrajectoryPoints(successfulCelestial.transform.position);
+            requiredVelocity = GetRequiredVelocity(Vector3.Distance(trajectoryPoints[transitionPointIndex],successfulCelestial.transform.position),successfulCelestialRigidBody.mass);
         }
     }
 
-    Vector3[] GetActiveCelestialsPos() {
+    void EstablishedNewOrbit() {
         
-        GameObject[] celestials = GameObject.FindGameObjectsWithTag("celestial");
-        Vector3[] celestialsPos = new Vector3[celestials.Length];
-        for (int i = 0; i < celestials.Length; i++) {
-            celestialsPos[i] = celestials[i].transform.position;
-            }
-        return celestialsPos;
+        if (((transform.position.x > trajectoryPoints[transitionPointIndex].x && trajectoryPoints[transitionPointIndex].x > lastPos.x) 
+                || (transform.position.x < trajectoryPoints[transitionPointIndex].x && trajectoryPoints[transitionPointIndex].x < lastPos.x))
+           &&   ((transform.position.y > trajectoryPoints[transitionPointIndex].y && trajectoryPoints[transitionPointIndex].y > lastPos.y)
+                || (transform.position.y < trajectoryPoints[transitionPointIndex].y && trajectoryPoints[transitionPointIndex].y < lastPos.y))) {
+            Debug.Log("EstablishedNewOrbit");
+            Vector3 transitionVel = Vector2.down * Mathf.Abs(speed.magnitude-requiredVelocity);
+            playerRigidbody.AddRelativeForce(transitionVel);
+            awatingTransition = false;
+        }
+        lastPos = transform.position;
+        
+        
+    }
+    
+
+    GameObject[] GetActiveCelestialsPos() {
+        return GameObject.FindGameObjectsWithTag("celestial");
     }
 
 
     //fortfarande buggig om celestial är under vad man kommer från
     bool CelestialInsideTrajectory() {
-        Vector3[] celestials = GetActiveCelestialsPos();
+        GameObject[] celestials = GetActiveCelestialsPos();
         int i = 0;
         Vector3 last = Vector3.zero;
-        foreach (Vector3 celestial in celestials) {                 
+        foreach (GameObject celestial in celestials) {
+            Vector3 celestialPos = celestial.transform.position;              
             foreach (Vector3 trajectoryPoint in trajectoryPoints) {
-                if((trajectoryPoint.y > celestial.y && last.y < celestial.y)||(trajectoryPoint.y < celestial.y && last.y > celestial.y)) {
-                    if (trajectoryPoint.x > celestial.x) {
+                if((trajectoryPoint.y > celestialPos.y && last.y < celestialPos.y)||(trajectoryPoint.y < celestialPos.y && last.y > celestialPos.y)) {
+                    if (trajectoryPoint.x > celestialPos.x) {
                         i++;
                     } else {
                         i++;
                     }
-                } else if((trajectoryPoint.x > celestial.x && last.x < celestial.x)||(trajectoryPoint.x < celestial.x && last.x > celestial.x)) {
-                    if (trajectoryPoint.y > celestial.y) {
+                } else if((trajectoryPoint.x > celestialPos.x && last.x < celestialPos.x)||(trajectoryPoint.x < celestialPos.x && last.x > celestialPos.x)) {
+                    if (trajectoryPoint.y > celestialPos.y) {
                         i++;
                     } else {
                         i++;
                     }
                 }
-                last = trajectoryPoint;
-                
+                last = trajectoryPoint;   
             }
             if (i == 4) {
                 successfulCelestial = celestial;
+                successfulCelestialRigidBody = celestial.GetComponent<Rigidbody2D>();
+                celestialInside = true;
                 return true;
             }
         }
-        return i==4;
+        return false;
     }
     
     void DotifyTrjctry() {
@@ -222,10 +283,10 @@ public class PlayerWithGravity : MonoBehaviour {
             lastS = s;
             step++;
         }
-        trajectoryPointsLength = step / simplify;
-        trajectoryLine.SetVertexCount(trajectoryPointsLength);
+        nbrOfTrajectoryPoints = step / simplify;
+        trajectoryLine.SetVertexCount(nbrOfTrajectoryPoints);
         
-        for(int i = 0; i < trajectoryPointsLength; i++) {
+        for(int i = 0; i < nbrOfTrajectoryPoints; i++) {
             trajectoryLine.SetPosition(i, trajectoryPoints[i]);
         }
     }
