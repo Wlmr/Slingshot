@@ -20,7 +20,7 @@ public class PlayerWithGravity : MonoBehaviour {
     private Vector2 speed;
     private float grvtyPull;
 
-    public int nrmlTime = 6;
+   public int nrmlTime = 6;
 
     private readonly float grvtyCnst = 0.000001f;
 
@@ -59,14 +59,21 @@ public class PlayerWithGravity : MonoBehaviour {
     float requiredVelocity;
     Vector3 lastPos;
     bool awatingTransition = false;
+
+    private int counter;
+
+    static public bool startCamMovment;
+
     /*
     TODO:
-        1.        Fix how much force is added on EstablishNewTraj() - olika i de två fallen?!
+        1.        Figure out why the spacecraft usually needs to rounds to establish new orbit
         2.        Divide the force over several frames so that it looks as if it is burning opposite?
+        3.        Fixa så att den närmsta celestial testas först i CelestialInsideTrajectory();
     */
 
 
     void Start() {
+        startCamMovment = false;
         privateMaxCount = maxCount;                                                             //for DotifyTrajectory() 
         trajectoryPoints = new Vector3[privateMaxCount];                                        //for DotifyTrajectory()
         dt = Time.fixedDeltaTime * 10;                                                          //for DotifyTrajectory()
@@ -87,13 +94,14 @@ public class PlayerWithGravity : MonoBehaviour {
 
 
     void FixedUpdate() {
-        
+        counter++;
         playerRigidbody.AddForce(GetGravity(transform.position));               
         transform.rotation = Rotate(playerRigidbody);
         if (newChange) { DotifyTrjctry(); newChange = false; }                                      //if something happens — run DotifyTrajectory() 
         if (!awatingTransition) {                                                                   
             if ((Input.touchCount > 0 || Input.anyKey)) {
                 if (firstBurn) {
+                    startCamMovment = true;
                     Time.timeScale = nrmlTime / 10f;                                    //lerp into slowmotion perhaps???
                     firstBurn = false;                                                  //för att veta när man slutat bränna
                     burning = true;
@@ -162,10 +170,6 @@ public class PlayerWithGravity : MonoBehaviour {
     }
 
 
-    //NÖDVÄNDIG???
-    //void GetValuesForEstablishingNewOrbit(GameObject celestial, Rigidbody2D celestialRigidbody) {
-    //    GetRequiredVelocity(Vector3.Distance(pointOfBurn,celestial.transform.position),celestialRigidbody.mass);
-    //}
 
     void EstablishedNewOrbit(Vector3 pointOfBurn) {
         if (((transform.position.x > pointOfBurn.x && pointOfBurn.x > lastPos.x) 
@@ -179,13 +183,8 @@ public class PlayerWithGravity : MonoBehaviour {
             Vector2 tempForward = GetDirectionVector(bodyBeingOrbited.transform.position);
             Vector2 Forward = new Vector2(tempForward.y, -tempForward.x);   //rotates "gravityVector": TempForward 90 degrees clockwise -- forward
             Forward.Normalize();
-            if (celestialInside) {
-                transitionVel = Forward * requiredVelocity;
-            } else {
-                transitionVel = Forward * requiredVelocity;
-            }
+            transitionVel = Forward * requiredVelocity;
             playerRigidbody.velocity = transitionVel;
-           
         }
         lastPos = transform.position;
         
@@ -201,23 +200,27 @@ public class PlayerWithGravity : MonoBehaviour {
     //fortfarande buggig om celestial är under vad man kommer från 
     bool CelestialInsideTrajectory() {
         GameObject[] celestials = GetActiveCelestialsPos();
+        //GameObject[] celestias;
+        //foreach(GameObject cel in celestialsTemp) {
+        //    celestials =
+        //}
         int i = 0;
         Vector3 last = trajectoryPoints[nbrOfTrajectoryPoints-1];
         foreach (GameObject celestial in celestials) {
             Vector3 celestialPos = celestial.transform.position;
             bool a, b, c, d;                                                            //switches so that each statement only can be true once
             a = b = c = d = true;
-            foreach (Vector3 trajectoryPoint in trajectoryPoints) {
-                if((trajectoryPoint.y > celestialPos.y && last.y < celestialPos.y)||(trajectoryPoint.y < celestialPos.y && last.y > celestialPos.y)) {
-                    if (trajectoryPoint.x > celestialPos.x && a) {
+            for (int j = 0; j < nbrOfTrajectoryPoints; j++) {
+                if ((trajectoryPoints[j].y > celestialPos.y && last.y < celestialPos.y) || (trajectoryPoints[j].y < celestialPos.y && last.y > celestialPos.y)) {
+                    if (trajectoryPoints[j].x > celestialPos.x && a) {
                         i++;
                         a = false;
-                    } else if(b) {
+                    } else if (b) {
                         i++;
                         b = false;
                     }
-                } else if((trajectoryPoint.x > celestialPos.x && last.x < celestialPos.x)||(trajectoryPoint.x < celestialPos.x && last.x > celestialPos.x)) {
-                    if (trajectoryPoint.y > celestialPos.y && c) {
+                } else if ((trajectoryPoints[j].x > celestialPos.x && last.x < celestialPos.x) || (trajectoryPoints[j].x < celestialPos.x && last.x > celestialPos.x)) {
+                    if (trajectoryPoints[j].y > celestialPos.y && c) {
                         i++;
                         c = false;
                     } else if(d) {
@@ -225,7 +228,10 @@ public class PlayerWithGravity : MonoBehaviour {
                         d = false;
                     }
                 }
-                last = trajectoryPoint;   
+
+                int fivePointsBefore = (nbrOfTrajectoryPoints-5+j)%nbrOfTrajectoryPoints;
+                Debug.Log(fivePointsBefore);
+                last = trajectoryPoints[fivePointsBefore];
             }
             if (i == 4) {
                 successfulCelestial = celestial;
@@ -258,7 +264,7 @@ public class PlayerWithGravity : MonoBehaviour {
             a = GetGravity(s);
             v += a * dt;
             s += v * dt;
-            tempAngleSum += Vector3.Angle(s, lastS);
+            tempAngleSum += Vector3.Angle(lastS, s);
             lastS = s;
             step++;
         }
