@@ -23,12 +23,13 @@ public class celestialScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+
         transform.Rotate(Vector3.forward * rotationalSpeed/100);
         if ((gameObject.transform.position.y + col.radius) < overlord.screenLowerBoundary) {
             Destroy(gameObject);
         }
-	}
-    
+    }
 
-    
+
+
 }

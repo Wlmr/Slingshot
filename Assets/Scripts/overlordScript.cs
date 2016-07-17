@@ -18,9 +18,9 @@ public class overlordScript : MonoBehaviour {
     public GameObject prefab3;
     public GameObject prefab4;
 
-    private float xRange;
-    private float yMin;
-    private float yMax;
+    public float xRndRange;
+    
+    public float yDistance;
     private Vector2 prefabPos;
 
     private float xRnd;
@@ -43,18 +43,15 @@ public class overlordScript : MonoBehaviour {
     */
 
     // Use this for initialization
-    void Start () {
+    void Start() {
         celestialsQueue = new Queue<GameObject>();
 
         counter = 1;
 
         prefabPos = Vector2.zero;
-        xRange = 1.5f;
-        yMin = 2.5f;
-        yMax = 4f;
-        InstansiateCelestial();
-        InstansiateCelestial();
-        playerStartPosY = (int) player.position.y;
+        for (int i = 0; i < 5; i++) { 
+            InstansiateCelestial();
+        }
         fuckedUp = false;
 	}
 
@@ -78,9 +75,9 @@ public class overlordScript : MonoBehaviour {
     }
 
     void GetRandomValues() {
-        xRnd = Random.Range(-xRange, xRange);
-        yRnd = Random.Range(yMin, yMax);
-        prefabPos.y += yRnd;
+        xRnd = Random.Range(-xRndRange, xRndRange);
+        //yRnd = Random.Range(yMin, yMax);
+        prefabPos.y += yDistance;
         prefabPos.x = xRnd;
     }
 

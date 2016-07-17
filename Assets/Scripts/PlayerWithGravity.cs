@@ -23,9 +23,9 @@ public class PlayerWithGravity : MonoBehaviour {
 
 
     private bool firstBurn = true;
-    private bool firstAfterBurn = false;
+  //  private bool firstAfterBurn = false;
     private bool burning = false;
-    private bool firstCalc = true;
+  //  private bool firstCalc = true;
 
     private Vector2 speed;
     private float grvtyPull;
@@ -57,7 +57,7 @@ public class PlayerWithGravity : MonoBehaviour {
     //for CelestialInsideTrajectory()/TryEstablishNewOrbit()
 
     GameObject successfulCelestial;
-    Rigidbody2D successfulCelestialRigidBody;
+   // Rigidbody2D successfulCelestialRigidBody;
     bool celestialInside;
     private Vector3 pointOfBurn;
 
@@ -82,10 +82,10 @@ public class PlayerWithGravity : MonoBehaviour {
 
     /*
     TODO:
-        1.        Make player start pi radians angle on the first celestial
-        2.        PROPOSITION: Divide the force over several frames so that it looks as if it is burning opposite?
+        2.        PROPOSITION: Divide the force over several frames so that it looks as if it is burning opposite? - when deaccelerating
         3.        Fixa queue som varje ny celestialprefab läggs in i. celestialInside testar sedan denna med första elementet i kön (celestial längst ner)
-        4.        Mätare (animering) som fylls när man gasat så mycket som man kan (förhindrar att man bara gasar tills banan är rak
+        4.        Mätare (animering) som fylls när man gasat så mycket som man kan (förhindrar att man bara gasar tills banan är rak samt att bana blir för stor och drar förmycket cpu 
+        5.        möjligen en dynamisk dt variabel med inverst förhållande till velocity
 
     */
 
@@ -117,10 +117,9 @@ public class PlayerWithGravity : MonoBehaviour {
 
 
     void FixedUpdate() {
-        
         playerRigidbody.AddForce(GetGravity(transform.position));               
         transform.rotation = Rotate(playerRigidbody);
-        if (newChange) { DotifyTrjctry(); newChange = false; }                                      //if something happens — run DotifyTrajectory() 
+       if (newChange) { DotifyTrjctry(); newChange = false; }                                      //if something happens — run DotifyTrajectory() 
         if (!awatingTransition) {                                                                   
             if ((Input.touchCount > 0 || Input.anyKey)) {
                 if (firstBurn) {
@@ -133,6 +132,7 @@ public class PlayerWithGravity : MonoBehaviour {
                 if (burning) { Burn(); }
             } else {
                 if (burning) {                                                          //checks if last frame was burning
+                    Debug.Log(step);
                     burning = false;
                     awatingTransition = true;
                     if (CelestialInsideTrajectory()) {
@@ -153,6 +153,7 @@ public class PlayerWithGravity : MonoBehaviour {
 
 
     void Burn() {
+        
         playerRigidbody.AddRelativeForce(Vector2.up * nrmlTime / 3000 * thrust);
         speed = playerRigidbody.velocity;
         newChange = true;
@@ -231,7 +232,7 @@ public class PlayerWithGravity : MonoBehaviour {
         awatingTransition = false;
         newChange = true;
         Vector2 tempForward = GetDirectionVector(bodyBeingOrbited.transform.position);
-        Vector2 Forward = new Vector2(tempForward.y, -tempForward.x);   //rotates "gravityVector": TempForward 90 degrees clockwise -- forward
+        Vector2 Forward = new Vector2(tempForward.y, - tempForward.x);   //rotates "gravityVector": TempForward 90 degrees clockwise -- forward
         Forward.Normalize();
         transitionVel = Forward * requiredVelocity;
         playerRigidbody.velocity = transitionVel;
@@ -243,7 +244,7 @@ public class PlayerWithGravity : MonoBehaviour {
 
     //fixa insertionsort för längd till player
     bool CelestialInsideTrajectory() {
-
+        
         ArrayList celestials = new ArrayList(GameObject.FindGameObjectsWithTag("celestial"));
 
         int i = 0;
@@ -277,7 +278,7 @@ public class PlayerWithGravity : MonoBehaviour {
             if (i == 4) {
 
                 successfulCelestial = celestial;
-                successfulCelestialRigidBody = celestial.GetComponent<Rigidbody2D>();
+                //successfulCelestialRigidBody = celestial.GetComponent<Rigidbody2D>();
                 celestialInside = true;
                 return true;
             } else {
@@ -309,12 +310,14 @@ public class PlayerWithGravity : MonoBehaviour {
             tempAngleSum += Vector3.Angle(lastS, s);
             lastS = s;
             step++;
+
         }
         nbrOfTrajectoryPoints = step / simplify;
         trajectoryLine.SetVertexCount(nbrOfTrajectoryPoints);
         for(int i = 0; i < nbrOfTrajectoryPoints; i++) {
             trajectoryLine.SetPosition(i, trajectoryPoints[i]);
         }
+
     }
     
 }

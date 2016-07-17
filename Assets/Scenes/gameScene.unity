@@ -154,7 +154,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 105830113}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.01, y: 0.99, z: -0}
+  m_LocalPosition: {x: 0.01, y: 0, z: -0}
   m_LocalScale: {x: 0.10184668, y: 0.10184669, z: 0.10184669}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
@@ -229,7 +229,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 174055508}
   m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071067}
-  m_LocalPosition: {x: 0.011, y: 0.681, z: 0}
+  m_LocalPosition: {x: 0.011, y: 1.48, z: 0}
   m_LocalScale: {x: 0.050294198, y: 0.051132355, z: 0.06218198}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
   m_Children:
@@ -284,7 +284,7 @@ LineRenderer:
     endWidth: 0.01
     m_StartColor:
       serializedVersion: 2
-      rgba: 4280325623
+      rgba: 4290329615
     m_EndColor:
       serializedVersion: 2
       rgba: 4280128759
@@ -317,12 +317,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70f0329bda556f94db5a01e8002de294, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.8
-  nrmlTime: 4
+  radius: 0.6
+  nrmlTime: 5
   simplify: 15
-  maxCount: 1000
+  maxCount: 150
   scoreText: {fileID: 882804774}
-  thrust: 1.5
+  thrust: 3
 --- !u!1 &467774777
 GameObject:
   m_ObjectHideFlags: 0
@@ -414,7 +414,7 @@ RectTransform:
   m_RootOrder: 1
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1, y: 122}
+  m_AnchoredPosition: {x: -1, y: 97}
   m_SizeDelta: {x: 406, y: 251}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &882804774
@@ -438,7 +438,7 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 12800000, guid: d770dcf456544ef45b7f795e46f8523f, type: 3}
-    m_FontSize: 139
+    m_FontSize: 233
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 8
@@ -491,6 +491,8 @@ MonoBehaviour:
   prefab2: {fileID: 132320, guid: 632320477bc4a344597550cbcdf6f84f, type: 2}
   prefab3: {fileID: 0}
   prefab4: {fileID: 0}
+  xRndRange: 0.5
+  yDistance: 1.3
   player: {fileID: 174055510}
   fuckedUp: 0
 --- !u!4 &1266259402
@@ -2304,7 +2306,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1757907077}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.95, z: -10}
+  m_LocalPosition: {x: 0, y: 2.07, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
