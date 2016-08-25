@@ -19,7 +19,8 @@ public class overlordScript : MonoBehaviour {
     public GameObject prefab4;
 
     public float xRndRange;
-    
+    private int spriteIndex; 
+
     public float yDistance;
     private Vector2 prefabPos;
 
@@ -27,28 +28,29 @@ public class overlordScript : MonoBehaviour {
     private float yRnd;
 
     public Transform player;
-
     private int playerStartPosY;
-
     //private int score;
     //private int distanceTravelled;
-
     public Queue<GameObject> celestialsQueue;
-
     private int counter;
-
     public bool fuckedUp;
+    private PlayerWithGravity playerwithgravitySC;
+
+    public Sprite[] sprites;
+
+    
+
 
     /*TODO:
     */
 
     // Use this for initialization
     void Start() {
+        sprites = Resources.LoadAll<Sprite>("celestialspritesheet");
+        playerwithgravitySC = GameObject.Find("player").GetComponent<PlayerWithGravity>();
         celestialsQueue = new Queue<GameObject>();
-
         counter = 1;
-
-        prefabPos = Vector2.zero;
+        prefabPos = GameObject.Find("StartCelestial").transform.position;
         for (int i = 0; i < 5; i++) { 
             InstansiateCelestial();
         }
@@ -57,8 +59,11 @@ public class overlordScript : MonoBehaviour {
 
     // Update is called once per frame
     void FixedUpdate() {
+
         background.Rotate(Vector3.forward / 30);
-        if (PlayerWithGravity.startCamMovment && !fuckedUp) { cam.transform.Translate(Vector3.up / 2000 * universeSpeed); }
+        if (PlayerWithGravity.startCamMovment && !fuckedUp) {
+            cam.transform.Translate(Vector3.up / 2000 * universeSpeed);
+        }
         screenLowerBoundary = cam.ScreenToWorldPoint(new Vector2(0, 0)).y;
     }
 
@@ -68,6 +73,7 @@ public class overlordScript : MonoBehaviour {
     public void InstansiateCelestial() {
         GetRandomValues();
         GameObject obj = (GameObject) Instantiate(prefab1, prefabPos, Quaternion.identity);
+        obj.GetComponent<SpriteRenderer>().sprite = sprites[spriteIndex];
         obj.name = "prefab" + counter;
         celestialsQueue.Enqueue(obj);
         counter++;
@@ -79,6 +85,7 @@ public class overlordScript : MonoBehaviour {
         //yRnd = Random.Range(yMin, yMax);
         prefabPos.y += yDistance;
         prefabPos.x = xRnd;
+        spriteIndex = (int) Random.Range(0, 99);
     }
 
 	

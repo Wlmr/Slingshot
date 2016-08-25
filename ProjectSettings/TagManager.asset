@@ -46,12 +46,15 @@ TagManager:
   - name: Background
     uniqueID: 2531667803
     locked: 0
-  - name: Celestials
-    uniqueID: 2873706845
-    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Celestials
+    uniqueID: 2873706845
+    locked: 0
   - name: The Ship
     uniqueID: 3614164477
+    locked: 0
+  - name: UI
+    uniqueID: 4132153497
     locked: 0
