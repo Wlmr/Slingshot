@@ -18,14 +18,12 @@ public class celestialScript : MonoBehaviour {
         mass = 150000;
         col = GetComponent<CircleCollider2D>();
         overlord = GameObject.Find("OVERLORD").GetComponent<overlordScript>();
-        
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
         transform.Rotate(Vector3.forward * rotationalSpeed/50);
-        if ((this.transform.position.y + col.radius) < overlord.screenLowerBoundary) {
-            
+        if ((this.transform.position.y + col.radius) < overlord.screenLowerBoundary) { 
             Destroy(this.gameObject);
         }
     }

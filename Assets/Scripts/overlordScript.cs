@@ -31,12 +31,13 @@ public class overlordScript : MonoBehaviour {
     private int playerStartPosY;
     //private int score;
     //private int distanceTravelled;
-    public Queue<GameObject> celestialsQueue;
+    public static Queue<GameObject> celestialsQueue;
     private int counter;
-    public bool fuckedUp;
+    public static bool fuckedUp;
     private PlayerWithGravity playerwithgravitySC;
 
     public Sprite[] sprites;
+    public Queue<int> earlierSprites;
 
     
 
@@ -46,6 +47,7 @@ public class overlordScript : MonoBehaviour {
 
     // Use this for initialization
     void Start() {
+        earlierSprites = new Queue<int>();
         sprites = Resources.LoadAll<Sprite>("celestialspritesheet");
         playerwithgravitySC = GameObject.Find("player").GetComponent<PlayerWithGravity>();
         celestialsQueue = new Queue<GameObject>();
@@ -59,15 +61,9 @@ public class overlordScript : MonoBehaviour {
 
     // Update is called once per frame
     void FixedUpdate() {
-
-        background.Rotate(Vector3.forward / 30);
-        if (PlayerWithGravity.startCamMovment && !fuckedUp) {
-            cam.transform.Translate(Vector3.up / 2000 * universeSpeed);
-        }
+        background.Rotate(Vector3.forward / 30);   
         screenLowerBoundary = cam.ScreenToWorldPoint(new Vector2(0, 0)).y;
     }
-
-
 
     //MAKE IT CHOSE RANDOMLY WHICH CELESTIAL TO CHOSE
     public void InstansiateCelestial() {
@@ -77,7 +73,6 @@ public class overlordScript : MonoBehaviour {
         obj.name = "prefab" + counter;
         celestialsQueue.Enqueue(obj);
         counter++;
-        
     }
 
     void GetRandomValues() {
@@ -85,6 +80,7 @@ public class overlordScript : MonoBehaviour {
         //yRnd = Random.Range(yMin, yMax);
         prefabPos.y += yDistance;
         prefabPos.x = xRnd;
+        
         spriteIndex = (int) Random.Range(0, 99);
     }
 
