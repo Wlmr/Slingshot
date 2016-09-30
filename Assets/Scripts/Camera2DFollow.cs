@@ -8,11 +8,11 @@ public class Camera2DFollow : MonoBehaviour {
     private Color retryColor;
 
     public Vector3 target;
-    public float damping = 10;
-    public float lookAheadFactor = 3;
-    public float lookAheadReturnSpeed = 0.5f;
-    public float lookAheadMoveThreshold = 0.1f;
-    public float downFactor = 2f;
+    public float damping;
+    public float lookAheadFactor;
+    public float lookAheadReturnSpeed;
+    public float lookAheadMoveThreshold;
+    public float downFactor;
 
     private float m_OffsetZ;
     private Vector3 m_LastTargetPosition;

@@ -75,7 +75,7 @@ public class PlayerWithGravity : MonoBehaviour {
 
     private bool outOfFuel;
 
-
+    public int firstTimePlaying;
 
     //CHANGE IF YOU CHANGE THE SIZE OF THE CELESTIALS
     public float minApoapsis;
@@ -86,42 +86,62 @@ public class PlayerWithGravity : MonoBehaviour {
     /*
     TODO:
         2.        PROPOSITION: Divide the force over several frames so that it looks as if it is burning opposite? - when deaccelerating
-        4.        Mätare (animering) som fylls när man gasat så mycket som man kan (förhindrar att man bara gasar tills banan är rak samt att bana blir för stor och drar förmycket cpu 
+     
         5.        möjligen en dynamisk dt variabel med inverst förhållande till velocity
-        6.        ta bort anglemätningarna eftersom de alltid blir fullt antal steps ändå ((((DOTIFYTRAJECTORY())))))
-        7.        Set maxValue för slider to be equal to the velocity required to make 
+   
 
     */
 
 
     void Start() {
-        mainCam = GameObject.Find("Main Camera").GetComponent<Camera>();
-        camera2DFollowSC = GameObject.Find("Main Camera").GetComponent<Camera2DFollow>();
-        startCamMovment = false;
-        overlord = GameObject.Find("OVERLORD");
-        overlordSC = overlord.GetComponent<overlordScript>();
-        
-
-        score = 0;
-        previousPositions = new Queue<Vector3>();
-        privateMaxCount = maxCount;                                                             //for DotifyTrajectory() 
-        trajectoryPoints = new Vector3[privateMaxCount];                                        //for DotifyTrajectory()
-        dt = Time.fixedDeltaTime * 10;                                                          //for DotifyTrajectory()
-        bodyBeingOrbited = GameObject.FindGameObjectWithTag("orbitingCelestial");                      //initial orbit around celestial with tag "startOrbit" now called bodyBeingOrbited
-        oldCelestial = bodyBeingOrbited;
-        trajectoryLine = GetComponent<LineRenderer>();                                          
-        playerRigidbody = GetComponent<Rigidbody2D>();
-        playerWeight = playerRigidbody.mass;
-        celestialMass = bodyBeingOrbited.GetComponent<celestialScript>().mass;
+        if (!PlayerPrefs.HasKey("firstTime")) {
+            firstTimePlaying = 1;
+            PlayerPrefs.SetInt("firstTime", 0);
+        } else {
+            firstTimePlaying = PlayerPrefs.GetInt("firstTime");
+        }
+        setReferencesOnStart();
+        setValuesOnStart();
         transform.localPosition = new Vector2(bodyBeingOrbited.transform.position.x, bodyBeingOrbited.transform.position.y+radius); //putting the spaceship in place
-        speed = Vector2.left * Mathf.Sqrt(grvtyCnst * celestialMass / radius);                                        //calculating speed for circular orbit
         playerRigidbody.velocity = speed;                                                                                               //adding the speed
         Time.timeScale = nrmlTime;                                                                                                      //speeding up time so that updating the trajectory path run smoothly
         ResetFuelSlider();
         DotifyTrjctry();
+    }
 
+    void runTutorials() {
         
     }
+
+        
+
+
+
+   
+
+    void setReferencesOnStart() {
+        mainCam = GameObject.Find("Main Camera").GetComponent<Camera>();
+        camera2DFollowSC = GameObject.Find("Main Camera").GetComponent<Camera2DFollow>();
+        overlord = GameObject.Find("OVERLORD");
+        overlordSC = overlord.GetComponent<overlordScript>();
+        bodyBeingOrbited = GameObject.FindGameObjectWithTag("orbitingCelestial");                      //initial orbit around celestial with tag "startOrbit" now called bodyBeingOrbited
+        oldCelestial = bodyBeingOrbited;
+        trajectoryLine = GetComponent<LineRenderer>();
+        playerRigidbody = GetComponent<Rigidbody2D>();
+        playerWeight = playerRigidbody.mass;
+        celestialMass = bodyBeingOrbited.GetComponent<celestialScript>().mass;
+    }
+
+    void setValuesOnStart() {
+        score = 0;
+        startCamMovment = false;
+        speed = Vector2.left * Mathf.Sqrt(grvtyCnst * celestialMass / radius);                  //calculating speed for circular orbit
+        previousPositions = new Queue<Vector3>();
+        privateMaxCount = maxCount;                                                             //for DotifyTrajectory() 
+        trajectoryPoints = new Vector3[privateMaxCount];                                        //for DotifyTrajectory()
+        dt = Time.fixedDeltaTime * 10;                                                          //for DotifyTrajectory()
+    }
+
 
     void updateRadius() {
         radius = (bodyBeingOrbited.transform.position - gameObject.transform.position).magnitude;
@@ -130,7 +150,6 @@ public class PlayerWithGravity : MonoBehaviour {
     
 
     void FixedUpdate() {
-        
         playerRigidbody.AddForce(GetGravity(transform.position));               
         transform.rotation = Rotate(playerRigidbody);
        if (newChange) {DotifyTrjctry(); newChange = false;}                             //if something happens — run DotifyTrajectory() 
