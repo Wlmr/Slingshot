@@ -7,7 +7,8 @@ public class PlayerWithGravity : MonoBehaviour {
 
     //OTHER GAMEOBJECTS REFERENCED
     GameObject overlord;
-    overlordScript overlordSC;
+    public overlordScript overlordSC;
+    public IPlantCelestials IPlantCelestialsSC;
     Camera2DFollow camera2DFollowSC;
     Camera mainCam;
     public GameObject retryButton;
@@ -17,7 +18,7 @@ public class PlayerWithGravity : MonoBehaviour {
 
     private Transform crashCelestial;
     private LineRenderer trajectoryLine;
-    public   GameObject bodyBeingOrbited;
+    public GameObject bodyBeingOrbited;
     private Rigidbody2D playerRigidbody;
     private int celestialMass;
     //private Rigidbody2D bodyBeingOrbitedRigidbody;
@@ -94,12 +95,7 @@ public class PlayerWithGravity : MonoBehaviour {
 
 
     void Start() {
-        if (!PlayerPrefs.HasKey("firstTime")) {
-            firstTimePlaying = 1;
-            PlayerPrefs.SetInt("firstTime", 0);
-        } else {
-            firstTimePlaying = PlayerPrefs.GetInt("firstTime");
-        }
+        
         setReferencesOnStart();
         setValuesOnStart();
         transform.localPosition = new Vector2(bodyBeingOrbited.transform.position.x, bodyBeingOrbited.transform.position.y+radius); //putting the spaceship in place
@@ -287,7 +283,7 @@ public class PlayerWithGravity : MonoBehaviour {
             bodyBeingOrbited.tag = "orbitingCelestial";
             score++;
             scoreText.text = "" + score;
-            overlordSC.InstansiateCelestial();
+            IPlantCelestialsSC.CelestialFactory();
             celestialInside = false;
         }
         awatingTransition = false;
@@ -304,8 +300,8 @@ public class PlayerWithGravity : MonoBehaviour {
 
     bool CelestialInsideTrajectory() {
         int i = 0;
-        Vector3 last = trajectoryPoints[nbrOfTrajectoryPoints-1];
-        foreach (GameObject celestial in overlordScript.celestialsQueue) {
+        Vector3 last = trajectoryPoints[nbrOfTrajectoryPoints-10];
+        foreach (GameObject celestial in IPlantCelestialsSC.getCelestialsQueue()) {
             Vector3 celestialPos = celestial.transform.position;
             bool a, b, c, d;                                                            //switches so that each statement only can be true once
             a = b = c = d = true;
@@ -327,15 +323,15 @@ public class PlayerWithGravity : MonoBehaviour {
                         d = false;
                     }
                 }
-                int fivePointsBefore = (nbrOfTrajectoryPoints-5+j)%nbrOfTrajectoryPoints;
-                last = trajectoryPoints[fivePointsBefore];
+                int tenPointsBefore = (nbrOfTrajectoryPoints-10+j)%nbrOfTrajectoryPoints;
+                last = trajectoryPoints[tenPointsBefore];
             }
             if (i == 4) {
                 oldCelestial = bodyBeingOrbited;
                 successfulCelestial = celestial;
                 camera2DFollowSC.SetTarget(successfulCelestial.transform.position);
                 celestialInside = true;
-                overlordScript.celestialsQueue.Dequeue();
+                IPlantCelestialsSC.celestialsQueue.Dequeue();
                 return true;
             } else {
                 i = 0;

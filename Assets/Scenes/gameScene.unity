@@ -241,6 +241,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70f0329bda556f94db5a01e8002de294, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  overlordSC: {fileID: 1266259401}
+  IPlantCelestialsSC: {fileID: 1266259404}
   retryButton: {fileID: 1564441046}
   radius: 0.75
   bodyBeingOrbited: {fileID: 0}
@@ -251,6 +253,7 @@ MonoBehaviour:
   scoreText: {fileID: 882804774}
   thrust: 1
   fuel: {fileID: 1828722833}
+  firstTimePlaying: 0
   minApoapsis: 0.42848
   maxApoapsis: 1.1
   maxBurns: 68
@@ -2792,6 +2795,8 @@ GameObject:
   m_Component:
   - 4: {fileID: 1266259402}
   - 114: {fileID: 1266259401}
+  - 114: {fileID: 1266259404}
+  - 114: {fileID: 1266259403}
   m_Layer: 0
   m_Name: OVERLORD
   m_TagString: Untagged
@@ -2814,13 +2819,43 @@ MonoBehaviour:
   cam: {fileID: 1757907081}
   screenLowerBoundary: 0
   universeSpeed: 4
-  prefab1: {fileID: 132162, guid: 1aeef82ac06e0ae48b16f9563c0c2c15, type: 2}
-  prefab2: {fileID: 0}
-  prefab3: {fileID: 0}
-  prefab4: {fileID: 0}
-  xRndRange: 0.5
+--- !u!4 &1266259402
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1266259400}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 94.98933, y: 329.85864, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+--- !u!114 &1266259403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1266259400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edfa4b01ac41a2141ae74587dcf0721e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1266259404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1266259400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab410fd962d82cd468f5636648e00f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ArbitraryCelestial: {fileID: 132162, guid: 1aeef82ac06e0ae48b16f9563c0c2c15, type: 2}
   yDistance: 1.4
-  player: {fileID: 174055510}
   sprites:
   - {fileID: 0}
   - {fileID: 0}
@@ -2922,19 +2957,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
---- !u!4 &1266259402
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1266259400}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 94.98933, y: 329.85864, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 5
+  xRndRange: 0.5
 --- !u!1 &1436123971
 GameObject:
   m_ObjectHideFlags: 0
