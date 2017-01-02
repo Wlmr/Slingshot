@@ -18,9 +18,9 @@ public class IPlantCelestials : MonoBehaviour {
         sprites = Resources.LoadAll<Sprite>("celestialspritesheet");
         prefabPos = GameObject.Find("StartCelestial").transform.position;
         celestialsQueue = new Queue<GameObject>();
-        for (int i = 0; i < 5; i++) {CelestialFactory();
+        for (int i = 0; i < 5; i++) {
+            CelestialFactory();
         }
-
     }
 
     public Queue<GameObject> getCelestialsQueue() {
@@ -28,7 +28,6 @@ public class IPlantCelestials : MonoBehaviour {
     }
 
     public void CelestialFactory() {
-        
         prefabPos.y += yDistance;
         prefabPos.x = Random.Range(-xRndRange, xRndRange);
         GameObject obj = (GameObject)Instantiate(ArbitraryCelestial, prefabPos, Quaternion.identity);

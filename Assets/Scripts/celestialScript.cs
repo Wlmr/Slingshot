@@ -17,7 +17,7 @@ public class celestialScript : MonoBehaviour {
         rotationalSpeed = Random.Range(-3, 3);
         mass = 150000;
         col = GetComponent<CircleCollider2D>();
-        overlord = GameObject.Find("OVERLORD").GetComponent<overlordScript>();
+        overlord = GameObject.Find("Overlord").GetComponent<overlordScript>();
 	}
 	
 	// Update is called once per frame

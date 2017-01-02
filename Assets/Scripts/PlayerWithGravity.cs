@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class PlayerWithGravity : MonoBehaviour {
@@ -28,7 +29,7 @@ public class PlayerWithGravity : MonoBehaviour {
     private bool burning = false;
     private Vector2 speed;
     private float grvtyPull;
-    public int nrmlTime = 6;
+    public float nrmlTime;
     private readonly float grvtyCnst = 0.000002f;
     private Vector2 directionVectorTowardsCelestial;
 
@@ -77,6 +78,7 @@ public class PlayerWithGravity : MonoBehaviour {
     private bool outOfFuel;
 
     public int firstTimePlaying;
+    public bool tutorialActive;
 
     //CHANGE IF YOU CHANGE THE SIZE OF THE CELESTIALS
     public float minApoapsis;
@@ -84,10 +86,13 @@ public class PlayerWithGravity : MonoBehaviour {
     public int maxBurns;
     public int minBurns;
 
+
+
     /*
     TODO:
+        1.          && !EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId)
         2.        PROPOSITION: Divide the force over several frames so that it looks as if it is burning opposite? - when deaccelerating
-     
+        3.          
         5.        möjligen en dynamisk dt variabel med inverst förhållande till velocity
    
 
@@ -95,7 +100,7 @@ public class PlayerWithGravity : MonoBehaviour {
 
 
     void Start() {
-        
+        nrmlTime = 6.0F;
         setReferencesOnStart();
         setValuesOnStart();
         transform.localPosition = new Vector2(bodyBeingOrbited.transform.position.x, bodyBeingOrbited.transform.position.y+radius); //putting the spaceship in place
@@ -103,11 +108,10 @@ public class PlayerWithGravity : MonoBehaviour {
         Time.timeScale = nrmlTime;                                                                                                      //speeding up time so that updating the trajectory path run smoothly
         ResetFuelSlider();
         DotifyTrjctry();
-    }
-
-    void runTutorials() {
+        tutorialActive = false;
         
     }
+    
 
         
 
@@ -118,7 +122,7 @@ public class PlayerWithGravity : MonoBehaviour {
     void setReferencesOnStart() {
         mainCam = GameObject.Find("Main Camera").GetComponent<Camera>();
         camera2DFollowSC = GameObject.Find("Main Camera").GetComponent<Camera2DFollow>();
-        overlord = GameObject.Find("OVERLORD");
+        overlord = GameObject.Find("Overlord");
         overlordSC = overlord.GetComponent<overlordScript>();
         bodyBeingOrbited = GameObject.FindGameObjectWithTag("orbitingCelestial");                      //initial orbit around celestial with tag "startOrbit" now called bodyBeingOrbited
         oldCelestial = bodyBeingOrbited;
@@ -150,7 +154,7 @@ public class PlayerWithGravity : MonoBehaviour {
         transform.rotation = Rotate(playerRigidbody);
        if (newChange) {DotifyTrjctry(); newChange = false;}                             //if something happens — run DotifyTrajectory() 
         if (!awatingTransition) {                                                                   
-            if ((Input.touchCount > 0 || Input.anyKey)) {
+            if ((Input.touchCount > 0 || Input.anyKey) && !tutorialActive) {
                 if (firstBurn) {
                     startCamMovment = true;
                     Time.timeScale = nrmlTime / 10f;                                    //lerp into slowmotion perhaps???
@@ -207,14 +211,10 @@ public class PlayerWithGravity : MonoBehaviour {
 
     
     void OnTriggerEnter2D(Collider2D col) {
-        Crash();
+        overlordSC.Crash();
+        gameObject.SetActive(false);
     }
 
-    void Crash() {
-        overlordScript.fuckedUp = true;
-        gameObject.SetActive(false);
-        retryButton.SetActive(true);
-    }
 
     Quaternion Rotate(Rigidbody2D obj) {
         float zRotation = Mathf.Atan2(directionVectorTowardsCelestial.y, directionVectorTowardsCelestial.x) * Mathf.Rad2Deg;
