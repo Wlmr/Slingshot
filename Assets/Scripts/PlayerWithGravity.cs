@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class PlayerWithGravity : MonoBehaviour {
 
+    
 
     //OTHER GAMEOBJECTS REFERENCED
     GameObject overlord;
@@ -28,6 +29,7 @@ public class PlayerWithGravity : MonoBehaviour {
     private bool firstBurn = true;
     private bool burning = false;
     private Vector2 speed;
+    public float orbitalPeriod;
     private float grvtyPull;
     public float nrmlTime;
     private readonly float grvtyCnst = 0.000002f;
@@ -109,6 +111,7 @@ public class PlayerWithGravity : MonoBehaviour {
         ResetFuelSlider();
         DotifyTrjctry();
         tutorialActive = false;
+        orbitalPeriod = 2 * Mathf.PI * Mathf.Sqrt((Mathf.Pow(radius, 3)) / (grvtyCnst * celestialMass));
         
     }
     
@@ -147,9 +150,8 @@ public class PlayerWithGravity : MonoBehaviour {
         radius = (bodyBeingOrbited.transform.position - gameObject.transform.position).magnitude;
     }
 
-    
 
-    void FixedUpdate() {
+    public void FixedUpdate() {
         playerRigidbody.AddForce(GetGravity(transform.position));               
         transform.rotation = Rotate(playerRigidbody);
        if (newChange) {DotifyTrjctry(); newChange = false;}                             //if something happens — run DotifyTrajectory() 
