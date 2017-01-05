@@ -17,28 +17,25 @@ public class Tutorial : MonoBehaviour {
     private int currentTextIndex;
 
     public float threshold;
-    public Text[] tutorialTexts = new Text[2];
+    public Text[] tutorialTexts = new Text[3];
     public PlayerWithGravity playerWithGravitySC;
     public IPlantCelestials iPlantCelestialsSC;
     public overlordScript overlordSC;
 
     private float dampSpeed = 6f;
 
-    private bool readyForFirstText, transitioning, readyToMoveOn;
+    private bool transitioning, readyToMoveOn;
     
 
     // Use this for initialization
     void Start () {
         currentTextIndex = 0;
-        readyForFirstText = transitioning = readyToMoveOn = false;
-       
+        transitioning = readyToMoveOn = false;
         if (isFirstTimePlaying()) {
-            tutorialButton.gameObject.SetActive(true);
-            readyForFirstText = true;
             playerWithGravitySC.tutorialActive = true;
             PlayerPrefs.SetInt("firstTime", 0);
+            updateTutorialText();
         }
-
     }
 
     void getPointOfBurn() {
@@ -47,23 +44,33 @@ public class Tutorial : MonoBehaviour {
         Vector2 secondCelestialPos = iPlantCelestialsSC.celestialsQueue.Peek().transform.position;
         Vector2 triggerPos = startCelestialPos - secondCelestialPos;
         triggerPos += (triggerPos.normalized * radius.magnitude);
-        triggerVector = triggerPos;                              //probably wont be neccessary
+        triggerVector = triggerPos;
+    }
+    
+
+    void updateTutorialText() {
+        if (currentTextIndex == 0) { // First time, activated by tutorialbutton.
+            tutorialButton.gameObject.SetActive(true);
+            tutorialTexts[0].gameObject.SetActive(true);
+            textBackground.SetActive(true);
+            currentTextIndex++;
+        } else if(currentTextIndex == tutorialTexts.Length) { // Last case, when tutorial finishes.
+            tutorialTexts[currentTextIndex].gameObject.SetActive(false);
+            textBackground.SetActive(false);
+        } else if (currentTextIndex == tutorialTexts.Length - 1) { // Start breaking.
+            ShowNextText();
+            getPointOfBurn();
+            transitioning = true;
+            tutorialButton.gameObject.SetActive(false);
+        } else {
+            ShowNextText();
+        }
     }
 
-
-    void firstTutorialText() {
-        textBackground.SetActive(true);
-        activateTutorialText(true);
-        getPointOfBurn();
-        
-    }
-
-    void secondTutorialText() {
-        
-    }
-
-    void activateTutorialText(bool boolean) {
-        tutorialTexts[currentTextIndex].gameObject.SetActive(boolean);
+    private void ShowNextText() {
+        tutorialTexts[currentTextIndex-1].gameObject.SetActive(false);
+        tutorialTexts[currentTextIndex].gameObject.SetActive(true);
+        currentTextIndex++;
     }
 
     bool isFirstTimePlaying() {
@@ -73,54 +80,35 @@ public class Tutorial : MonoBehaviour {
     public void activateTutorial() {
         if (PlayerPrefs.HasKey("firstTime")) {
             PlayerPrefs.DeleteKey("firstTime");
-            //PlayerPrefs.Save();
         }
         overlordSC.Restarter();  
     }
 
     public void tutorialButtonClicked() {
-        if (currentTextIndex == 0) {
-
-            transitioning = true;
-            activateTutorialText(false);
-            currentTextIndex++;
-            activateTutorialText(true);
-        } else if (currentTextIndex == 1) {
-            secondTutorialText();
-
-            tutorialButton.gameObject.SetActive(false);
-        }
+        Debug.Log("clicked");
+        Debug.Log(currentTextIndex);
+        updateTutorialText();
     }
 	
-
-   
 
 	// Update is called once per frame
 	void Update() {
         if (readyToMoveOn) {
             if(Input.touchCount > 0 || Input.anyKey) {
+                textBackground.SetActive(false);
                 playerWithGravitySC.tutorialActive = false;
                 Time.timeScale = 6f;
-                activateTutorialText(false);
-                textBackground.SetActive(false);
-                //currentTextIndex++;
-                //activateTutorialText(true);
+                updateTutorialText();
                 gameObject.SetActive(false);
             }
-        } else if (readyForFirstText) {
-            firstTutorialText();
-            readyForFirstText = false;
         } else if (transitioning) {
             float angle = Vector2.Angle((player.position - startCelestial.position), triggerVector);
-          
             Time.timeScale = Mathf.SmoothDamp(Time.timeScale, 1f,ref dampSpeed, 0.05f);
             Debug.Log(Time.timeScale);
             if (Mathf.Abs(angle) < threshold) {
-                activateTutorialText(true);
+                updateTutorialText();
                 Time.timeScale = 0f;
-                if(currentTextIndex == 1) {
-                    readyToMoveOn = true;
-                }
+                readyToMoveOn = true;            
             }
         }
     }

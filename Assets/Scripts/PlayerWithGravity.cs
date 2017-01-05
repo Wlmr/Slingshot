@@ -12,7 +12,7 @@ public class PlayerWithGravity : MonoBehaviour {
     public overlordScript overlordSC;
     public IPlantCelestials IPlantCelestialsSC;
     Camera2DFollow camera2DFollowSC;
-    Camera mainCam;
+    //Camera mainCam;
     public GameObject retryButton;
 
 
@@ -23,7 +23,8 @@ public class PlayerWithGravity : MonoBehaviour {
     public GameObject bodyBeingOrbited;
     private Rigidbody2D playerRigidbody;
     private int celestialMass;
-    //private Rigidbody2D bodyBeingOrbitedRigidbody;
+
+  
 
     private int burnCounter = 0;
     private bool firstBurn = true;
@@ -46,7 +47,7 @@ public class PlayerWithGravity : MonoBehaviour {
     private float angle;
     private float dt;
     private Vector3 s;
-    private Vector3 lastS;
+    //private Vector3 lastS;
     private Vector3 v;
     private Vector3 a;
     private float tempAngleSum;
@@ -123,7 +124,7 @@ public class PlayerWithGravity : MonoBehaviour {
    
 
     void setReferencesOnStart() {
-        mainCam = GameObject.Find("Main Camera").GetComponent<Camera>();
+        //mainCam = GameObject.Find("Main Camera").GetComponent<Camera>();
         camera2DFollowSC = GameObject.Find("Main Camera").GetComponent<Camera2DFollow>();
         overlord = GameObject.Find("Overlord");
         overlordSC = overlord.GetComponent<overlordScript>();
@@ -133,6 +134,7 @@ public class PlayerWithGravity : MonoBehaviour {
         playerRigidbody = GetComponent<Rigidbody2D>();
         playerWeight = playerRigidbody.mass;
         celestialMass = bodyBeingOrbited.GetComponent<celestialScript>().mass;
+       
     }
 
     void setValuesOnStart() {
@@ -158,15 +160,18 @@ public class PlayerWithGravity : MonoBehaviour {
         if (!awatingTransition) {                                                                   
             if ((Input.touchCount > 0 || Input.anyKey) && !tutorialActive) {
                 if (firstBurn) {
+                    
                     startCamMovment = true;
                     Time.timeScale = nrmlTime / 10f;                                    //lerp into slowmotion perhaps???
                     firstBurn = false;                                                  //för att veta när man slutat bränna
                     burning = true;
-                    pointOfBurn = transform.position;                                                                   
+                    pointOfBurn = transform.position;
+                    
                 }
                 if (burning) { Burn(); }
             } else {
                 if (burning) {                                                          //checks if last frame was burning
+                    
                     burning = false;
                     burnCounter = 0;
                     awatingTransition = true;
@@ -189,6 +194,7 @@ public class PlayerWithGravity : MonoBehaviour {
 
     void Burn() {
         if (!outOfFuel) {
+            
             burnCounter++;
             playerRigidbody.AddRelativeForce(Vector2.up * nrmlTime / 3000 * thrust);
             speed = playerRigidbody.velocity;
@@ -208,7 +214,6 @@ public class PlayerWithGravity : MonoBehaviour {
     void ChangeFuelValue() {
         fuel.value = burnCounter;
         outOfFuel = burnCounter > fuel.maxValue;
-        
     }
 
     
@@ -346,7 +351,6 @@ public class PlayerWithGravity : MonoBehaviour {
             speed = playerRigidbody.velocity;
             trajectoryPoints = new Vector3[privateMaxCount];
             s = transform.position;
-            lastS = s;
             v = speed / 10;
             a = GetGravity(s);
             step = 0;
@@ -357,7 +361,6 @@ public class PlayerWithGravity : MonoBehaviour {
                 a = GetGravity(s);
                 v += a * dt;
                 s += v * dt;
-                lastS = s;
                 step++;
             }
             nbrOfTrajectoryPoints = step / simplify;

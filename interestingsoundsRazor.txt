@@ -1,0 +1,23 @@
+Satisfactionsound:
+leads 
+	octavemus prime
+	childsplay
+	Oneironaut
+	voyager
+	disco bell
+Soundscapes
+	rolling
+	Still life
+
+keys and bells
+	bellophonia
+
+
+background sound:
+Soundscapes
+	planet 8
+
+
+burn:
+SFX
+	bruto hypno

@@ -3,11 +3,12 @@ using System.Collections;
 using UnityEngine.UI;
 
 public class toggleScript : MonoBehaviour {
+    private Toggle toggle;
 
-	// Use this for initialization
-	void Start () {
+    void Start() {
+        toggle = GetComponent<Toggle>();
         if (PlayerPrefs.HasKey("Musiken")) {
-            GetComponent<Toggle>().isOn = (PlayerPrefs.GetInt("Musiken") == 1) ? false : true;
+            toggle.isOn = (PlayerPrefs.GetInt("Musiken") == 1) ? false : true;
         }
     }
 }

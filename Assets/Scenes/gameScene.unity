@@ -369,7 +369,7 @@ RectTransform:
   m_RootOrder: 2
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -135}
+  m_AnchoredPosition: {x: 0, y: -117}
   m_SizeDelta: {x: 451, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &451357622
@@ -396,7 +396,7 @@ MonoBehaviour:
     m_FontSize: 21
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 20
+    m_MinSize: 0
     m_MaxSize: 205
     m_Alignment: 4
     m_AlignByGeometry: 1
@@ -404,7 +404,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1.31
-  m_Text: 'Touch the screen to burn your engine. '
+  m_Text: Throttle when the ship is in the lower part of the orbit to make the trajectory
+    grow upwards...
 --- !u!222 &451357623
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -505,7 +506,7 @@ RectTransform:
   m_RootOrder: 1
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -135}
+  m_AnchoredPosition: {x: 0, y: -117}
   m_SizeDelta: {x: 451, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &595326122
@@ -532,7 +533,7 @@ MonoBehaviour:
     m_FontSize: 21
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 20
+    m_MinSize: 18
     m_MaxSize: 205
     m_Alignment: 4
     m_AlignByGeometry: 1
@@ -541,13 +542,88 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1.31
   m_Text: Navigate your ship away from the collapsing solar system by firing your
-    engines.
+    engines...
 --- !u!222 &595326123
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 595326120}
+--- !u!1 &662843301
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 662843302}
+  - 222: {fileID: 662843303}
+  - 114: {fileID: 662843304}
+  m_Layer: 5
+  m_Name: 3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &662843302
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 662843301}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.55722857, y: 0.55722874, z: 1.3930718}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 1459118240}
+  m_RootOrder: 3
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0.000061035156, y: -117}
+  m_SizeDelta: {x: 451, y: 60}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &662843303
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 662843301}
+--- !u!114 &662843304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 662843301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: e1811962c79e65647af3c81b0a0f843e, type: 3}
+    m_FontSize: 21
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 0
+    m_MaxSize: 205
+    m_Alignment: 4
+    m_AlignByGeometry: 1
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1.31
+  m_Text: Burn the engines left of the planet and the trajectory expand to the right,
+    and so on...
 --- !u!1 &700446481
 GameObject:
   m_ObjectHideFlags: 0
@@ -2455,7 +2531,7 @@ AudioSource:
   m_Volume: 0.587
   m_Pitch: 1
   Loop: 1
-  Mute: 1
+  Mute: 0
   Spatialize: 0
   Priority: 128
   DopplerLevel: 1
@@ -2574,6 +2650,8 @@ MonoBehaviour:
   tutorialTexts:
   - {fileID: 595326122}
   - {fileID: 451357622}
+  - {fileID: 662843304}
+  - {fileID: 1761281791}
   playerWithGravitySC: {fileID: 174055515}
   iPlantCelestialsSC: {fileID: 1266259404}
   overlordSC: {fileID: 1266259401}
@@ -2805,7 +2883,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: reset
+  m_Text: play
 --- !u!222 &971004851
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2987,9 +3065,9 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.997, g: 1, b: 1, a: 0.765}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_HighlightedColor: {r: 1, g: 1, b: 1, a: 0.6627451}
+    m_PressedColor: {r: 1, g: 1, b: 1, a: 0.6627451}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 0.6627451}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -3315,7 +3393,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -135.8}
+  m_AnchoredPosition: {x: 0, y: -117}
   m_SizeDelta: {x: 0, y: 46.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1405278658
@@ -3480,6 +3558,7 @@ RectTransform:
   - {fileID: 1405278657}
   - {fileID: 595326121}
   - {fileID: 451357621}
+  - {fileID: 662843302}
   - {fileID: 1761281790}
   - {fileID: 1813653891}
   m_Father: {fileID: 1436123975}
@@ -5564,7 +5643,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1757907077}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.031999964, y: 32.99996, z: -9.76}
+  m_LocalPosition: {x: 0.031999964, y: 32.80016, z: -9.76}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
@@ -5617,7 +5696,7 @@ GameObject:
   - 222: {fileID: 1761281792}
   - 114: {fileID: 1761281791}
   m_Layer: 5
-  m_Name: 3
+  m_Name: 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5635,10 +5714,10 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 1459118240}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -135}
+  m_AnchoredPosition: {x: 0, y: -117}
   m_SizeDelta: {x: 451, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1761281791
@@ -5673,7 +5752,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1.31
-  m_Text: 'Keep encircling adjecent planets to escape. '
+  m_Text: Touch the screen to engage the engines.
 --- !u!222 &1761281792
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5715,7 +5794,7 @@ RectTransform:
   m_Children:
   - {fileID: 203680040}
   m_Father: {fileID: 1459118240}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
@@ -6084,9 +6163,9 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_HighlightedColor: {r: 1, g: 1, b: 1, a: 0.666}
+    m_PressedColor: {r: 1, g: 1, b: 1, a: 0.6627451}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 0.6627451}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -6119,7 +6198,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!114 &2083238222
 MonoBehaviour:
   m_ObjectHideFlags: 0

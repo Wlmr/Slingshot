@@ -16,22 +16,22 @@ public class Camera2DFollow : MonoBehaviour {
     public float speedOfCollapsingUniverse;
 
     private float m_OffsetZ;
-    private Vector3 m_LastTargetPosition;
+   // private Vector3 m_LastTargetPosition;
     private Vector3 m_CurrentVelocity;
     private Vector3 m_LookAheadPos;
-    private Vector3 currentCelestial;
+  //  private Vector3 currentCelestial;
         
     // Use this for initialization
     private void Start() {
         retryColor = new Color(0, 0, 0, 0.2f);
         SetTarget(GameObject.Find("StartCelestial").transform.position);
-        m_LastTargetPosition = target;
+     //   m_LastTargetPosition = target;
         m_OffsetZ = (transform.position - target).z;
         transform.parent = null;
     }
 
     public void SetTarget(Vector3 target) {
-        currentCelestial = target;
+      //  currentCelestial = target;
         this.target = target + Vector3.up * downFactor;
     }
         
@@ -46,7 +46,7 @@ public class Camera2DFollow : MonoBehaviour {
         Vector3 aheadTargetPos = target + m_LookAheadPos + Vector3.forward * m_OffsetZ;
         Vector3 newPos = Vector3.SmoothDamp(transform.position, aheadTargetPos, ref m_CurrentVelocity, damping);
         transform.position = newPos;
-        m_LastTargetPosition = target;    
+   //     m_LastTargetPosition = target;    
     }
 }
 
