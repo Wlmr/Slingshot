@@ -113,7 +113,6 @@ public class PlayerWithGravity : MonoBehaviour {
         DotifyTrjctry();
         tutorialActive = false;
         orbitalPeriod = 2 * Mathf.PI * Mathf.Sqrt((Mathf.Pow(radius, 3)) / (grvtyCnst * celestialMass));
-        
     }
     
 
@@ -145,6 +144,7 @@ public class PlayerWithGravity : MonoBehaviour {
         privateMaxCount = maxCount;                                                             //for DotifyTrajectory() 
         trajectoryPoints = new Vector3[privateMaxCount];                                        //for DotifyTrajectory()
         dt = Time.fixedDeltaTime * 10;                                                          //for DotifyTrajectory()
+        orbitalPeriod = (2 * Mathf.PI * radius) / speed.magnitude;
     }
 
 

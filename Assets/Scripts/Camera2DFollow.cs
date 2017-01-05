@@ -6,6 +6,12 @@ public class Camera2DFollow : MonoBehaviour {
     //for RetryScreen
     public RawImage retryBG;
     private Color retryColor;
+    private Camera cam;
+
+    public PlayerWithGravity playerWithGravitySC;
+    public Slider fuel;
+    public float maxZoom;
+    public float minZoom;
 
     public Vector3 target;
     public float damping;
@@ -23,6 +29,8 @@ public class Camera2DFollow : MonoBehaviour {
         
     // Use this for initialization
     private void Start() {
+        fuel = playerWithGravitySC.fuel;
+        cam = GetComponent<Camera>();
         retryColor = new Color(0, 0, 0, 0.2f);
         SetTarget(GameObject.Find("StartCelestial").transform.position);
      //   m_LastTargetPosition = target;
@@ -37,6 +45,7 @@ public class Camera2DFollow : MonoBehaviour {
         
     // Update is called once per frame
     private void FixedUpdate(){
+       // cam.orthographicSize = Mathf.Lerp(maxZoom, minZoom, (fuel.value - fuel.minValue)/(fuel.maxValue-fuel.minValue));
         if (PlayerWithGravity.startCamMovment && !overlordScript.fuckedUp) {
             target += Vector3.up / speedOfCollapsingUniverse;
         } else if (overlordScript.fuckedUp) {

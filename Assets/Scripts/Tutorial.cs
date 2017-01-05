@@ -55,7 +55,7 @@ public class Tutorial : MonoBehaviour {
             textBackground.SetActive(true);
             currentTextIndex++;
         } else if(currentTextIndex == tutorialTexts.Length) { // Last case, when tutorial finishes.
-            tutorialTexts[currentTextIndex].gameObject.SetActive(false);
+            tutorialTexts[currentTextIndex-1].gameObject.SetActive(false);
             textBackground.SetActive(false);
         } else if (currentTextIndex == tutorialTexts.Length - 1) { // Start breaking.
             ShowNextText();
@@ -103,10 +103,9 @@ public class Tutorial : MonoBehaviour {
             }
         } else if (transitioning) {
             float angle = Vector2.Angle((player.position - startCelestial.position), triggerVector);
-            Time.timeScale = Mathf.SmoothDamp(Time.timeScale, 1f,ref dampSpeed, 0.05f);
-            Debug.Log(Time.timeScale);
+            float dTBurnPoint = (playerWithGravitySC.orbitalPeriod * (angle / 360f))/6;
+            Time.timeScale = Mathf.SmoothDamp(Time.timeScale, 1f,ref dampSpeed, dTBurnPoint);
             if (Mathf.Abs(angle) < threshold) {
-                updateTutorialText();
                 Time.timeScale = 0f;
                 readyToMoveOn = true;            
             }
