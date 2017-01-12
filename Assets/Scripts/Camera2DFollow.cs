@@ -9,9 +9,9 @@ public class Camera2DFollow : MonoBehaviour {
     private Camera cam;
 
     public PlayerWithGravity playerWithGravitySC;
-    public Slider fuel;
-    public float maxZoom;
-    public float minZoom;
+
+   
+   
 
     public Vector3 target;
     public float damping;
@@ -25,27 +25,37 @@ public class Camera2DFollow : MonoBehaviour {
    // private Vector3 m_LastTargetPosition;
     private Vector3 m_CurrentVelocity;
     private Vector3 m_LookAheadPos;
-  //  private Vector3 currentCelestial;
-        
+    public float maxSpeed;
+    private float deltaSpeed;
+    public int celestialNbrMaxSpeed;
+
+    //  private Vector3 currentCelestial;
+
     // Use this for initialization
     private void Start() {
-        fuel = playerWithGravitySC.fuel;
+        
         cam = GetComponent<Camera>();
         retryColor = new Color(0, 0, 0, 0.2f);
         SetTarget(GameObject.Find("StartCelestial").transform.position);
-     //   m_LastTargetPosition = target;
         m_OffsetZ = (transform.position - target).z;
         transform.parent = null;
+        deltaSpeed = Mathf.Abs( maxSpeed - speedOfCollapsingUniverse);
     }
 
     public void SetTarget(Vector3 target) {
-      //  currentCelestial = target;
         this.target = target + Vector3.up * downFactor;
     }
         
-    // Update is called once per frame
-    private void FixedUpdate(){
-       // cam.orthographicSize = Mathf.Lerp(maxZoom, minZoom, (fuel.value - fuel.minValue)/(fuel.maxValue-fuel.minValue));
+    public void SpeedIncrease() {
+        if (speedOfCollapsingUniverse > maxSpeed) {
+            speedOfCollapsingUniverse -= (deltaSpeed / celestialNbrMaxSpeed);
+
+        }
+    }
+
+private void FixedUpdate(){
+        // cam.orthographicSize = Mathf.Lerp(maxZoom, minZoom, (fuel.value - fuel.minValue)/(fuel.maxValue-fuel.minValue));
+       // ZoomCheck();
         if (PlayerWithGravity.startCamMovment && !overlordScript.fuckedUp) {
             target += Vector3.up / speedOfCollapsingUniverse;
         } else if (overlordScript.fuckedUp) {
@@ -56,6 +66,24 @@ public class Camera2DFollow : MonoBehaviour {
         Vector3 newPos = Vector3.SmoothDamp(transform.position, aheadTargetPos, ref m_CurrentVelocity, damping);
         transform.position = newPos;
    //     m_LastTargetPosition = target;    
+    }
+
+
+    public void ZoomCheck() {
+        float x0 = playerWithGravitySC.bodyBeingOrbited.transform.position.x;
+        float xMax = float.MinValue;
+        float xMin = float.MaxValue;
+        float dx = 0;
+        foreach (Vector3 point in playerWithGravitySC.trajectoryPoints) {
+            xMin = point.x < xMin ? point.x : xMin;
+            xMax = point.x > xMax ? point.x : xMax;
+        }
+        xMin -= x0;
+        xMax -= x0;
+        dx = Mathf.Abs(xMax) >= Mathf.Abs(xMin) ? xMax : xMin;
+        if ((dx * 2) > 3) cam.orthographicSize = dx * 2;  
+
+
     }
 }
 

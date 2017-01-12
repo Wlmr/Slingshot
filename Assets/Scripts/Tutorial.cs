@@ -81,12 +81,10 @@ public class Tutorial : MonoBehaviour {
         if (PlayerPrefs.HasKey("firstTime")) {
             PlayerPrefs.DeleteKey("firstTime");
         }
-        overlordSC.Restarter();  
+        overlordSC.PlayButton();  
     }
 
     public void tutorialButtonClicked() {
-        Debug.Log("clicked");
-        Debug.Log(currentTextIndex);
         updateTutorialText();
     }
 	

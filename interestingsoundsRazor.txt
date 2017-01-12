@@ -1,6 +1,6 @@
 Satisfactionsound:
 leads 
-	octavemus prime
+	
 	childsplay
 	Oneironaut
 	voyager

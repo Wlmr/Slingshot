@@ -13,29 +13,32 @@ public class overlordScript : MonoBehaviour {
     private int playerStartPosY;
     public static bool fuckedUp;
     public static int crashCounter = 0;
-    public static int adInterval = 5;
-    public GameObject[] menuButtons = new GameObject[3];
+    public int adInterval;
+    public GameObject menuButtons;
     public AudioSource musiken;
+    public bool menuButtonsActive;
   
 
     void Start() {
+        FirstPlay();
         fuckedUp = false;
+        
     }
+    
 
     public void Crash() {
         fuckedUp = true;
         crashCounter++;
         showAd();
-        ActivateMenu();
+        ActivateMenu(true);
     }
 
-    void ActivateMenu() {
-        foreach(GameObject g in menuButtons) {
-            g.SetActive(true);
-        }
+    bool ActivateMenu(bool boolean) {
+        menuButtons.SetActive(boolean);
+        return boolean;
     }
 
-    public static void showAd() {
+    public void showAd() {
         if (crashCounter % adInterval == 0 && Advertisement.IsReady()) {
             Advertisement.Show();
         }
@@ -45,10 +48,26 @@ public class overlordScript : MonoBehaviour {
         //background.Rotate(Vector3.forward / 30);   
         screenLowerBoundary = cam.ScreenToWorldPoint(new Vector2(0, 0)).y;
     }
-    public void Restarter (){
-        PlayerPrefs.SetInt("Musiken", musiken.mute == true ? 0 : 1);
-        PlayerPrefs.Save();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+    public void FirstPlay() {
+        if (!PlayerPrefs.HasKey("restarted")) {
+        } else {
+            PlayerPrefs.DeleteKey("restarted");
+            menuButtonsActive = ActivateMenu(false);
+        }
+    }
+
+    public void PlayButton (){
+        if (!PlayerPrefs.HasKey("restarted")) {
+            PlayerPrefs.SetInt("restarted", 1);
+            Debug.Log("hore");
+            menuButtonsActive= ActivateMenu(false);
+        } else {
+            PlayerPrefs.SetInt("Musiken", musiken.mute == false ? 1 : 0);
+            PlayerPrefs.SetInt("restarted", 0);
+            PlayerPrefs.Save();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
     }
 }
 

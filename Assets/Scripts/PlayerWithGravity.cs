@@ -38,7 +38,7 @@ public class PlayerWithGravity : MonoBehaviour {
 
 
     //for DotifyTrajectory()
-    private Vector3[] trajectoryPoints;
+    public Vector3[] trajectoryPoints;
     public int simplify;
     public int maxCount;
     private float playerWeight;
@@ -153,20 +153,21 @@ public class PlayerWithGravity : MonoBehaviour {
     }
 
 
+
+
+
     public void FixedUpdate() {
         playerRigidbody.AddForce(GetGravity(transform.position));               
         transform.rotation = Rotate(playerRigidbody);
        if (newChange) {DotifyTrjctry(); newChange = false;}                             //if something happens — run DotifyTrajectory() 
         if (!awatingTransition) {                                                                   
-            if ((Input.touchCount > 0 || Input.anyKey) && !tutorialActive) {
+            if ((!overlordSC.menuButtonsActive) && (Input.touchCount > 0 || Input.anyKey) && !tutorialActive) {
                 if (firstBurn) {
-                    
                     startCamMovment = true;
                     Time.timeScale = nrmlTime / 10f;                                    //lerp into slowmotion perhaps???
                     firstBurn = false;                                                  //för att veta när man slutat bränna
                     burning = true;
                     pointOfBurn = transform.position;
-                    
                 }
                 if (burning) { Burn(); }
             } else {
@@ -337,6 +338,7 @@ public class PlayerWithGravity : MonoBehaviour {
                 oldCelestial = bodyBeingOrbited;
                 successfulCelestial = celestial;
                 camera2DFollowSC.SetTarget(successfulCelestial.transform.position);
+                camera2DFollowSC.SpeedIncrease();
                 celestialInside = true;
                 IPlantCelestialsSC.celestialsQueue.Dequeue();
                 return true;

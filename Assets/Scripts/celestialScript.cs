@@ -15,7 +15,6 @@ public class celestialScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         rotationalSpeed = Random.Range(-3, 3);
-        mass = 150000;
         col = GetComponent<CircleCollider2D>();
         overlord = GameObject.Find("Overlord").GetComponent<overlordScript>();
 	}
