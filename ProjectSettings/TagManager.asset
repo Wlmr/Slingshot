@@ -20,7 +20,7 @@ TagManager:
   - 
   - Black Hole
   - celestials
-  - 
+  - Draw
   - 
   - 
   - 
@@ -54,6 +54,9 @@ TagManager:
     locked: 0
   - name: The Ship
     uniqueID: 3614164477
+    locked: 0
+  - name: Draw
+    uniqueID: 49562979
     locked: 0
   - name: UI
     uniqueID: 4132153497

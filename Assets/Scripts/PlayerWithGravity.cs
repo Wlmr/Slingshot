@@ -12,11 +12,13 @@ public class PlayerWithGravity : MonoBehaviour {
     public overlordScript overlordSC;
     public IPlantCelestials IPlantCelestialsSC;
     Camera2DFollow camera2DFollowSC;
+    public SatifactorySounds satisfactorySoundsSC;
+    public HighScore HighScoreSC;
     //Camera mainCam;
     public GameObject retryButton;
 
 
-    public float radius;
+    private float radius;
 
     private Transform crashCelestial;
     private LineRenderer trajectoryLine;
@@ -58,6 +60,7 @@ public class PlayerWithGravity : MonoBehaviour {
     public GameObject oldCelestial;
     private GameObject successfulCelestial;
 
+    public float threshold;
     bool celestialInside;
     private Vector3 pointOfBurn;
 
@@ -89,11 +92,14 @@ public class PlayerWithGravity : MonoBehaviour {
     public int maxBurns;
     public int minBurns;
 
+    public bool inputPresent;
+
+    public ParticleSystem explosion;
+
 
 
     /*
     TODO:
-        1.          && !EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId)
         2.        PROPOSITION: Divide the force over several frames so that it looks as if it is burning opposite? - when deaccelerating
         3.          
         5.        möjligen en dynamisk dt variabel med inverst förhållande till velocity
@@ -101,29 +107,7 @@ public class PlayerWithGravity : MonoBehaviour {
 
     */
 
-
-    void Start() {
-        nrmlTime = 6.0F;
-        setReferencesOnStart();
-        setValuesOnStart();
-        transform.localPosition = new Vector2(bodyBeingOrbited.transform.position.x, bodyBeingOrbited.transform.position.y+radius); //putting the spaceship in place
-        playerRigidbody.velocity = speed;                                                                                               //adding the speed
-        Time.timeScale = nrmlTime;                                                                                                      //speeding up time so that updating the trajectory path run smoothly
-        ResetFuelSlider();
-        DotifyTrjctry();
-        tutorialActive = false;
-        orbitalPeriod = 2 * Mathf.PI * Mathf.Sqrt((Mathf.Pow(radius, 3)) / (grvtyCnst * celestialMass));
-    }
-    
-
-        
-
-
-
-   
-
-    void setReferencesOnStart() {
-        //mainCam = GameObject.Find("Main Camera").GetComponent<Camera>();
+    void Awake() {
         camera2DFollowSC = GameObject.Find("Main Camera").GetComponent<Camera2DFollow>();
         overlord = GameObject.Find("Overlord");
         overlordSC = overlord.GetComponent<overlordScript>();
@@ -133,11 +117,21 @@ public class PlayerWithGravity : MonoBehaviour {
         playerRigidbody = GetComponent<Rigidbody2D>();
         playerWeight = playerRigidbody.mass;
         celestialMass = bodyBeingOrbited.GetComponent<celestialScript>().mass;
-       
+        score = 0;
     }
 
+    public void Start() {
+       //PlayerPrefs.DeleteAll();
+        
+        radius = 0.75f;
+        setValuesOnStart();
+        GetItSpinning();
+    }
+
+
+
     void setValuesOnStart() {
-        score = 0;
+        awatingTransition = false;
         startCamMovment = false;
         speed = Vector2.left * Mathf.Sqrt(grvtyCnst * celestialMass / radius);                  //calculating speed for circular orbit
         previousPositions = new Queue<Vector3>();
@@ -147,21 +141,27 @@ public class PlayerWithGravity : MonoBehaviour {
         orbitalPeriod = (2 * Mathf.PI * radius) / speed.magnitude;
     }
 
-
+    public void GetItSpinning() {
+        nrmlTime = 6.0F;
+        transform.localPosition = new Vector2(bodyBeingOrbited.transform.position.x, bodyBeingOrbited.transform.position.y + radius); //putting the spaceship in place
+        playerRigidbody.velocity = speed;                                                                                               //adding the speed
+        Time.timeScale = nrmlTime;                                                                                                      //speeding up time so that updating the trajectory path run smoothly
+        ResetFuelSlider();
+        DotifyTrjctry();
+        tutorialActive = false;
+    }
+    
     void updateRadius() {
         radius = (bodyBeingOrbited.transform.position - gameObject.transform.position).magnitude;
     }
 
 
-
-
-
-    public void FixedUpdate() {
+    public void FixedUpdate() {        
         playerRigidbody.AddForce(GetGravity(transform.position));               
         transform.rotation = Rotate(playerRigidbody);
        if (newChange) {DotifyTrjctry(); newChange = false;}                             //if something happens — run DotifyTrajectory() 
-        if (!awatingTransition) {                                                                   
-            if ((!overlordSC.menuButtonsActive) && (Input.touchCount > 0 || Input.anyKey) && !tutorialActive) {
+       if (!awatingTransition) {                                                                   
+            if (inputPresent && !tutorialActive && !overlordSC.menuButtons.activeSelf) {
                 if (firstBurn) {
                     startCamMovment = true;
                     Time.timeScale = nrmlTime / 10f;                                    //lerp into slowmotion perhaps???
@@ -172,7 +172,6 @@ public class PlayerWithGravity : MonoBehaviour {
                 if (burning) { Burn(); }
             } else {
                 if (burning) {                                                          //checks if last frame was burning
-                    
                     burning = false;
                     burnCounter = 0;
                     awatingTransition = true;
@@ -194,8 +193,7 @@ public class PlayerWithGravity : MonoBehaviour {
 
 
     void Burn() {
-        if (!outOfFuel) {
-            
+        if (!outOfFuel) { 
             burnCounter++;
             playerRigidbody.AddRelativeForce(Vector2.up * nrmlTime / 3000 * thrust);
             speed = playerRigidbody.velocity;
@@ -219,8 +217,21 @@ public class PlayerWithGravity : MonoBehaviour {
 
     
     void OnTriggerEnter2D(Collider2D col) {
-        overlordSC.Crash();
+        explosion.Play();
+        bool highScore, revive;
+        highScore = revive = false;
+
+        if(score > PlayerPrefs.GetInt("highscore")) {
+            PlayerPrefs.SetInt("highscore", score);
+            HighScoreSC.HighScoreUpdater();
+            highScore = true;
+        }
+        if(score > 0) {
+            revive = true;
+        }
+        overlordSC.Crash(highScore,revive);
         gameObject.SetActive(false);
+
     }
 
 
@@ -229,23 +240,15 @@ public class PlayerWithGravity : MonoBehaviour {
         return Quaternion.Euler(0f, 0f, zRotation - 180);
     }
 
-    
-    
-
     Vector3 GetGravity(Vector3 objAffected) {
         directionVectorTowardsCelestial = bodyBeingOrbited.transform.position - objAffected;
         return directionVectorTowardsCelestial.normalized * grvtyCnst * playerWeight * celestialMass / directionVectorTowardsCelestial.sqrMagnitude;
     }
 
-   
-
-
-
     //will be used for GetGravity too
     Vector3 GetDirectionVector(Vector3 celestial) {
         return directionVectorTowardsCelestial = (celestial - transform.position);
     }
-
   
     Vector3 GetPointClosestTo(Vector3 celestial) {
         float length = 100000000;
@@ -271,6 +274,7 @@ public class PlayerWithGravity : MonoBehaviour {
             || (transform.position.x < pointOfBurn.x && pointOfBurn.x < lastPos.x))
            && ((transform.position.y > pointOfBurn.y && pointOfBurn.y > lastPos.y)
             || (transform.position.y < pointOfBurn.y && pointOfBurn.y < lastPos.y))) {
+                
                 EstablishNewOrbitValues();
                 previousPositions.Clear();
             } else {
@@ -282,8 +286,10 @@ public class PlayerWithGravity : MonoBehaviour {
 
 
     private void EstablishNewOrbitValues() {
+        Debug.Log(score);
         Vector3 transitionVel = Vector2.zero;
         if (celestialInside) {
+            satisfactorySoundsSC.PrepareRandom();
             bodyBeingOrbited.tag = "celestial";
             bodyBeingOrbited = successfulCelestial;
             updateRadius();
@@ -291,6 +297,7 @@ public class PlayerWithGravity : MonoBehaviour {
             bodyBeingOrbited.tag = "orbitingCelestial";
             score++;
             scoreText.text = "" + score;
+            IPlantCelestialsSC.getCelestialsQueue().Dequeue();
             IPlantCelestialsSC.CelestialFactory();
             celestialInside = false;
         }
@@ -308,44 +315,45 @@ public class PlayerWithGravity : MonoBehaviour {
 
     bool CelestialInsideTrajectory() {
         int i = 0;
-        Vector3 last = trajectoryPoints[nbrOfTrajectoryPoints-10];
-        foreach (GameObject celestial in IPlantCelestialsSC.getCelestialsQueue()) {
-            Vector3 celestialPos = celestial.transform.position;
+            Vector3 celestialPos = IPlantCelestialsSC.getCelestialsQueue().Peek().transform.position;
+           // Debug.Log(celestialPos);
             bool a, b, c, d;                                                            //switches so that each statement only can be true once
             a = b = c = d = true;
             for (int j = 0; j < nbrOfTrajectoryPoints; j++) {
-                if ((trajectoryPoints[j].y > celestialPos.y && last.y < celestialPos.y) || (trajectoryPoints[j].y < celestialPos.y && last.y > celestialPos.y)) {
+                if (Mathf.Abs(trajectoryPoints[j].y - celestialPos.y) < threshold) {
                     if (trajectoryPoints[j].x > celestialPos.x && a) {
                         i++;
                         a = false;
-                    } else if (b) {
+                    } else if (trajectoryPoints[j].x < celestialPos.x && b) {
                         i++;
                         b = false;
                     }
-                } else if ((trajectoryPoints[j].x > celestialPos.x && last.x < celestialPos.x) || (trajectoryPoints[j].x < celestialPos.x && last.x > celestialPos.x)) {
+                } else if (Mathf.Abs(trajectoryPoints[j].x - celestialPos.x) < threshold) {
                     if (trajectoryPoints[j].y > celestialPos.y && c) {
                         i++;
                         c = false;
-                    } else if(d) {
+                    } else if(trajectoryPoints[j].y < celestialPos.y && d) {
                         i++;
                         d = false;
                     }
                 }
-                int tenPointsBefore = (nbrOfTrajectoryPoints-10+j)%nbrOfTrajectoryPoints;
-                last = trajectoryPoints[tenPointsBefore];
             }
             if (i == 4) {
-                oldCelestial = bodyBeingOrbited;
-                successfulCelestial = celestial;
+                
+               // oldCelestial = bodyBeingOrbited;
+                successfulCelestial = IPlantCelestialsSC.getCelestialsQueue().Peek();
                 camera2DFollowSC.SetTarget(successfulCelestial.transform.position);
                 camera2DFollowSC.SpeedIncrease();
                 celestialInside = true;
-                IPlantCelestialsSC.celestialsQueue.Dequeue();
+                
                 return true;
             } else {
+                //Debug.Log(celestialPos);
+                //Debug.Log("i: "+ i + ", a: " + a + ", b: " + b + ", c: " + c + ", d: " + d);
+
                 i = 0;
             }
-        }
+        //}
         return false;
     }
     
@@ -366,7 +374,7 @@ public class PlayerWithGravity : MonoBehaviour {
                 step++;
             }
             nbrOfTrajectoryPoints = step / simplify;
-            trajectoryLine.SetVertexCount(nbrOfTrajectoryPoints);
+            trajectoryLine.numPositions = nbrOfTrajectoryPoints;
             trajectoryLine.SetPositions(trajectoryPoints);    
         }
     }

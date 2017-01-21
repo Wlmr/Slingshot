@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class Tutorial : MonoBehaviour {
 
     public Button tutorialButton;
 
-    public GameObject textBackground; 
+    public Camera cam;
+    public RectTransform textComposite;
 
     private Vector2 lastPos;
     private float angleOfBurnPoint;
@@ -17,7 +19,8 @@ public class Tutorial : MonoBehaviour {
     private int currentTextIndex;
 
     public float threshold;
-    public Text[] tutorialTexts = new Text[3];
+    public Text[] tutorialTexts;
+    public GameObject textBackground;
     public PlayerWithGravity playerWithGravitySC;
     public IPlantCelestials iPlantCelestialsSC;
     public overlordScript overlordSC;
@@ -29,13 +32,20 @@ public class Tutorial : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        PositionTexts();
         currentTextIndex = 0;
         transitioning = readyToMoveOn = false;
-        if (isFirstTimePlaying()) {
+        if (overlordSC.NoPlayerPrefsKey("notFirstTime")) { //if it is first time playing, double negation
             playerWithGravitySC.tutorialActive = true;
-            PlayerPrefs.SetInt("firstTime", 0);
+            PlayerPrefs.SetInt("notFirstTime", 1);
+            PlayerPrefs.SetInt("notFirstRevive", 0);
             updateTutorialText();
+            overlordSC.ActivateMenu(false);
         }
+    }
+
+    void PositionTexts() {
+        textComposite.position = cam.WorldToScreenPoint(startCelestial.position);
     }
 
     void getPointOfBurn() {
@@ -73,16 +83,25 @@ public class Tutorial : MonoBehaviour {
         currentTextIndex++;
     }
 
-    bool isFirstTimePlaying() {
-        return !PlayerPrefs.HasKey("firstTime");
-    }
+    
 
     public void activateTutorial() {
-        if (PlayerPrefs.HasKey("firstTime")) {
-            PlayerPrefs.DeleteKey("firstTime");
+        overlordSC.showAd();
+        PlayerPrefs.SetInt("notFirstTime", 0);
+        PlayerPrefs.SetInt("notFirstRevive", 0);
+        if (overlordSC.NoPlayerPrefsKey("restarted") && overlordScript.fuckedUp == false) { //first round after launching app shouldnt reload scene
+            PlayerPrefs.SetInt("restarted", 1);
+            overlordSC.ActivateMenu(false);
+            Start();
+        } else {
+            PlayerPrefs.SetInt("Musiken", overlordSC.musiken.mute == false ? 1 : 0);
+            PlayerPrefs.Save();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
-        overlordSC.PlayButton();  
     }
+
+
+
 
     public void tutorialButtonClicked() {
         updateTutorialText();
@@ -92,12 +111,13 @@ public class Tutorial : MonoBehaviour {
 	// Update is called once per frame
 	void Update() {
         if (readyToMoveOn) {
-            if(Input.touchCount > 0 || Input.anyKey) {
+            if(playerWithGravitySC.inputPresent) {
                 textBackground.SetActive(false);
                 playerWithGravitySC.tutorialActive = false;
                 Time.timeScale = 6f;
                 updateTutorialText();
                 gameObject.SetActive(false);
+
             }
         } else if (transitioning) {
             float angle = Vector2.Angle((player.position - startCelestial.position), triggerVector);

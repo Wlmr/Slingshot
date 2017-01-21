@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class toggleScript : MonoBehaviour {
+public class SoundToggle : MonoBehaviour {
     private Toggle toggle;
 
     void Start() {

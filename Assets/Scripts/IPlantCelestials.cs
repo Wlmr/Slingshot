@@ -31,7 +31,7 @@ public class IPlantCelestials : MonoBehaviour {
         prefabPos.y += yDistance;
         prefabPos.x = Random.Range(-xRndRange, xRndRange);
         GameObject obj = (GameObject)Instantiate(ArbitraryCelestial, prefabPos, Quaternion.identity);
-        obj.GetComponent<SpriteRenderer>().sprite = sprites[(int)Random.Range(0, 99)];
+        obj.GetComponent<SpriteRenderer>().sprite = sprites[Random.Range(0,100)];
         obj.name = "prefab" + counter;
         celestialsQueue.Enqueue(obj);
         counter++;

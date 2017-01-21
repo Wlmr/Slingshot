@@ -12,35 +12,97 @@ public class overlordScript : MonoBehaviour {
     //public int universeSpeed;
     private int playerStartPosY;
     public static bool fuckedUp;
-    public static int crashCounter = 0;
+    public static int crashCounter = 1;
     public int adInterval;
+    private static int adIntervalPrivate;
     public GameObject menuButtons;
     public AudioSource musiken;
-    public bool menuButtonsActive;
-  
 
-    void Start() {
-        FirstPlay();
-        fuckedUp = false;
-        
-    }
+    public HighScore HighScoreSC;
+    public PlayerWithGravity playerWithGravitySC;
+    public Camera2DFollow Camera2DFollowSC;
+    public Button revive;
+    public GameObject reviveExp;
+
     
 
-    public void Crash() {
+    void Start() {
+        Debug.Log("adIntervalPrivate" + adIntervalPrivate);
+        if (adIntervalPrivate == 0) adIntervalPrivate = Random.Range(adInterval - 2, adInterval + 2);
+        CheckForRestart();
+        fuckedUp = false;
+        showAd();
+
+
+    }
+
+
+    public void Crash(bool highScore, bool reviveable) {
         fuckedUp = true;
         crashCounter++;
-        showAd();
+        Debug.Log("crashes: " + crashCounter);
         ActivateMenu(true);
+        if (highScore) {
+            HighScoreSC.CongratulateNewHighScore(true);
+        }
+        if (reviveable && crashCounter % (adIntervalPrivate/2) == 0) {
+            revive.gameObject.SetActive(true);
+            if (NoPlayerPrefsKey("notFirstRevive")) {
+                reviveExp.SetActive(true);
+                PlayerPrefs.SetInt("notFirstRevive", 1);
+            }
+        }
+
+
     }
 
-    bool ActivateMenu(bool boolean) {
+    private void Revive() {
+        playerWithGravitySC.gameObject.SetActive(true);
+        fuckedUp = false;
+        playerWithGravitySC.Start();
+        Camera2DFollowSC.SetTarget(playerWithGravitySC.bodyBeingOrbited.transform.position);
+        revive.gameObject.SetActive(false);
+        reviveExp.SetActive(false);
+        HighScoreSC.CongratulateNewHighScore(false);
+    }
+
+    private void HighScoreSetup() {
+
+    }
+
+    public void ActivateMenu(bool boolean) {
         menuButtons.SetActive(boolean);
-        return boolean;
     }
 
-    public void showAd() {
-        if (crashCounter % adInterval == 0 && Advertisement.IsReady()) {
+   
+    public void ShowRewardedAd() {
+        if (Advertisement.IsReady("rewardedVideo")) {
+            var options = new ShowOptions { resultCallback = HandleShowResult };
+            Advertisement.Show("rewardedVideo", options);
+        }
+    }
+
+    private void HandleShowResult(ShowResult result) {
+        switch (result) {
+            case ShowResult.Finished:
+               // Debug.Log("The ad was successfully shown.");
+                Revive();
+                break;
+            case ShowResult.Skipped:
+              //  Debug.Log("The ad was skipped before reaching the end.");
+                break;
+            case ShowResult.Failed:
+                //Debug.LogError("The ad failed to be shown.");
+                break;
+        }
+    }
+
+
+public void showAd() {
+        if (crashCounter % (adIntervalPrivate) == 0 && Advertisement.IsReady()) {
             Advertisement.Show();
+            adIntervalPrivate = Random.Range(adInterval - 2, adInterval + 2);
+            crashCounter = 1;
         }
     }
     
@@ -49,25 +111,40 @@ public class overlordScript : MonoBehaviour {
         screenLowerBoundary = cam.ScreenToWorldPoint(new Vector2(0, 0)).y;
     }
 
-    public void FirstPlay() {
-        if (!PlayerPrefs.HasKey("restarted")) {
-        } else {
-            PlayerPrefs.DeleteKey("restarted");
-            menuButtonsActive = ActivateMenu(false);
+    public void CheckForRestart() {
+        if (NoPlayerPrefsKey("veryFirstTime")) { //if played for the very first time tutorial should be played
+            ActivateMenu(false);
+        } else if (NoPlayerPrefsKey("restarted")) {
+            ActivateMenu(true);
+        } else { 
+            ActivateMenu(false);
         }
     }
 
+    public bool NoPlayerPrefsKey(string key) {
+        return (PlayerPrefs.GetInt(key) == 0 || !PlayerPrefs.HasKey(key));
+    }
+
     public void PlayButton (){
-        if (!PlayerPrefs.HasKey("restarted")) {
+        ActivateMenu(false);
+        HighScoreSC.Show(false);
+        if (NoPlayerPrefsKey("veryFirstTime")) { //allra första gången efter tutorial
+            PlayerPrefs.SetInt("veryFirstTime", 1);
             PlayerPrefs.SetInt("restarted", 1);
-            Debug.Log("hore");
-            menuButtonsActive= ActivateMenu(false);
+        }
+        if (NoPlayerPrefsKey("restarted")) { //first round after launching app shouldnt reload scene
+            PlayerPrefs.SetInt("restarted", 1);
         } else {
             PlayerPrefs.SetInt("Musiken", musiken.mute == false ? 1 : 0);
-            PlayerPrefs.SetInt("restarted", 0);
-            PlayerPrefs.Save();
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
+    }
+
+    void OnApplicationQuit() {
+        PlayerPrefs.SetInt("restarted",0);
+        PlayerPrefs.Save();
+        
+        //Debug.Log("quitted");
     }
 }
 

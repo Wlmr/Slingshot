@@ -6,6 +6,7 @@ public class Camera2DFollow : MonoBehaviour {
     //for RetryScreen
     public RawImage retryBG;
     private Color retryColor;
+    private Color antiRetryColor;
     private Camera cam;
 
     public PlayerWithGravity playerWithGravitySC;
@@ -36,6 +37,7 @@ public class Camera2DFollow : MonoBehaviour {
         
         cam = GetComponent<Camera>();
         retryColor = new Color(0, 0, 0, 0.2f);
+        antiRetryColor = new Color(0, 0, 0, 0);
         SetTarget(GameObject.Find("StartCelestial").transform.position);
         m_OffsetZ = (transform.position - target).z;
         transform.parent = null;
@@ -60,6 +62,8 @@ private void FixedUpdate(){
             target += Vector3.up / speedOfCollapsingUniverse;
         } else if (overlordScript.fuckedUp) {
             retryBG.color = new Color(1,1,1,Mathf.MoveTowards(retryBG.color.a, retryColor.a, 0.01f));
+        } else if (!overlordScript.fuckedUp) {
+            retryBG.color = new Color(1, 1, 1, Mathf.MoveTowards(retryBG.color.a, antiRetryColor.a , 0.01f));
         }
         m_LookAheadPos = Vector3.MoveTowards(m_LookAheadPos, Vector3.zero, Time.deltaTime * lookAheadReturnSpeed);
         Vector3 aheadTargetPos = target + m_LookAheadPos + Vector3.forward * m_OffsetZ;
@@ -69,21 +73,21 @@ private void FixedUpdate(){
     }
 
 
-    public void ZoomCheck() {
-        float x0 = playerWithGravitySC.bodyBeingOrbited.transform.position.x;
-        float xMax = float.MinValue;
-        float xMin = float.MaxValue;
-        float dx = 0;
-        foreach (Vector3 point in playerWithGravitySC.trajectoryPoints) {
-            xMin = point.x < xMin ? point.x : xMin;
-            xMax = point.x > xMax ? point.x : xMax;
-        }
-        xMin -= x0;
-        xMax -= x0;
-        dx = Mathf.Abs(xMax) >= Mathf.Abs(xMin) ? xMax : xMin;
-        if ((dx * 2) > 3) cam.orthographicSize = dx * 2;  
+    //public void ZoomCheck() {
+    //    float x0 = playerWithGravitySC.bodyBeingOrbited.transform.position.x;
+    //    float xMax = float.MinValue;
+    //    float xMin = float.MaxValue;
+    //    float dx = 0;
+    //    foreach (Vector3 point in playerWithGravitySC.trajectoryPoints) {
+    //        xMin = point.x < xMin ? point.x : xMin;
+    //        xMax = point.x > xMax ? point.x : xMax;
+    //    }
+    //    xMin -= x0;
+    //    xMax -= x0;
+    //    dx = Mathf.Abs(xMax) >= Mathf.Abs(xMin) ? xMax : xMin;
+    //    if ((dx * 2) > 3) cam.orthographicSize = dx * 2;  
 
 
-    }
+    
 }
 
