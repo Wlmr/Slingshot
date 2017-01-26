@@ -9,7 +9,9 @@ public class TODO : MonoBehaviour {
 - [x]   High score
 - [x]   launch app with buttons
 - [x]   Ads for extra life.
-- [ ]   First touch after launch burns too quick
+- [x]   First touch after launch burns too quick
 - [ ]   Write awake in overlord with PlayerPrefs
+- [ ]   "resume trying button" only when playing
+- [x]   make sure minburn maxburn etc works as it should
     */
 }

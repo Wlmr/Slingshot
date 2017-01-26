@@ -95,7 +95,7 @@ public class Tutorial : MonoBehaviour {
             Start();
         } else {
             PlayerPrefs.SetInt("Musiken", overlordSC.musiken.mute == false ? 1 : 0);
-            PlayerPrefs.Save();
+            
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }

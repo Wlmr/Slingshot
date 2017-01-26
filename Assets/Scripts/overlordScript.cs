@@ -16,6 +16,7 @@ public class overlordScript : MonoBehaviour {
     public int adInterval;
     private static int adIntervalPrivate;
     public GameObject menuButtons;
+    public GameObject resumeButton;
     public AudioSource musiken;
 
     public HighScore HighScoreSC;
@@ -27,7 +28,7 @@ public class overlordScript : MonoBehaviour {
     
 
     void Start() {
-        Debug.Log("adIntervalPrivate" + adIntervalPrivate);
+        Debug.Log(PlayerPrefs.GetInt("restarted"));
         if (adIntervalPrivate == 0) adIntervalPrivate = Random.Range(adInterval - 2, adInterval + 2);
         CheckForRestart();
         fuckedUp = false;
@@ -40,7 +41,7 @@ public class overlordScript : MonoBehaviour {
     public void Crash(bool highScore, bool reviveable) {
         fuckedUp = true;
         crashCounter++;
-        Debug.Log("crashes: " + crashCounter);
+       // Debug.Log("crashes: " + crashCounter);
         ActivateMenu(true);
         if (highScore) {
             HighScoreSC.CongratulateNewHighScore(true);
@@ -112,12 +113,10 @@ public void showAd() {
     }
 
     public void CheckForRestart() {
-        if (NoPlayerPrefsKey("veryFirstTime")) { //if played for the very first time tutorial should be played
+        if (NoPlayerPrefsKey("veryFirstTime") || PlayerPrefs.GetInt("restarted") == 1) { //if played for the very first time tutorial should be played
             ActivateMenu(false);
-        } else if (NoPlayerPrefsKey("restarted")) {
+        } else {
             ActivateMenu(true);
-        } else { 
-            ActivateMenu(false);
         }
     }
 
@@ -140,10 +139,23 @@ public void showAd() {
         }
     }
 
-    void OnApplicationQuit() {
-        PlayerPrefs.SetInt("restarted",0);
-        PlayerPrefs.Save();
-        
+    public void Resume() {
+        PlayerPrefs.SetInt("restarted", 1);
+        Time.timeScale = 6;                         //should be set dynamically
+        fuckedUp = false;
+        resumeButton.SetActive(false);
+    }
+
+    void OnApplicationPause(bool pauseStatus) {
+        if (pauseStatus && PlayerWithGravity.startCamMovment) {
+            PlayerPrefs.SetInt("restarted", 0);
+            PlayerPrefs.Save();
+            if ( !fuckedUp) {
+                resumeButton.SetActive(true);
+                Time.timeScale = 0;
+                fuckedUp = true;
+            }
+        }
         //Debug.Log("quitted");
     }
 }

@@ -18,7 +18,8 @@ public class PlayerWithGravity : MonoBehaviour {
     public GameObject retryButton;
 
 
-    private float radius;
+    public float radius;
+    public float grejtRadiusTreshold;
 
     private Transform crashCelestial;
     private LineRenderer trajectoryLine;
@@ -121,9 +122,8 @@ public class PlayerWithGravity : MonoBehaviour {
     }
 
     public void Start() {
-       //PlayerPrefs.DeleteAll();
-        
-        radius = 0.75f;
+        //PlayerPrefs.DeleteAll();
+        //radius = 0.75f;
         setValuesOnStart();
         GetItSpinning();
     }
@@ -153,6 +153,10 @@ public class PlayerWithGravity : MonoBehaviour {
     
     void updateRadius() {
         radius = (bodyBeingOrbited.transform.position - gameObject.transform.position).magnitude;
+    }
+    public bool RadRadBro() {
+        float idealRadius = ((IPlantCelestialsSC.celestialsQueue.Peek().transform.position - bodyBeingOrbited.transform.position).magnitude) / 2;
+        return Mathf.Abs(idealRadius - radius) < grejtRadiusTreshold;
     }
 
 
@@ -274,7 +278,6 @@ public class PlayerWithGravity : MonoBehaviour {
             || (transform.position.x < pointOfBurn.x && pointOfBurn.x < lastPos.x))
            && ((transform.position.y > pointOfBurn.y && pointOfBurn.y > lastPos.y)
             || (transform.position.y < pointOfBurn.y && pointOfBurn.y < lastPos.y))) {
-                
                 EstablishNewOrbitValues();
                 previousPositions.Clear();
             } else {
@@ -286,13 +289,15 @@ public class PlayerWithGravity : MonoBehaviour {
 
 
     private void EstablishNewOrbitValues() {
-        Debug.Log(score);
+        //Debug.Log(score);
         Vector3 transitionVel = Vector2.zero;
         if (celestialInside) {
-            satisfactorySoundsSC.PrepareRandom();
+            
             bodyBeingOrbited.tag = "celestial";
             bodyBeingOrbited = successfulCelestial;
             updateRadius();
+
+            satisfactorySoundsSC.PrepareRandom();
             celestialMass = bodyBeingOrbited.GetComponent<celestialScript>().mass;
             bodyBeingOrbited.tag = "orbitingCelestial";
             score++;
