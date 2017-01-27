@@ -55,7 +55,7 @@ public class Example : MonoBehaviour, AudioProcessor.AudioCallbacks
         {
             Vector3 start = new Vector3(i, 0, 0);
             Vector3 end = new Vector3(i, spectrum[i], 0);
-            Debug.DrawLine(start, end);
+           // Debug.DrawLine(start, end);
         }
     }
 }

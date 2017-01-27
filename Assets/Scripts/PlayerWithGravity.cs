@@ -18,7 +18,8 @@ public class PlayerWithGravity : MonoBehaviour {
     public GameObject retryButton;
 
 
-    public float radius;
+    public float radiusSetter;
+    private float radius;
     public float grejtRadiusTreshold;
 
     private Transform crashCelestial;
@@ -123,7 +124,7 @@ public class PlayerWithGravity : MonoBehaviour {
 
     public void Start() {
         //PlayerPrefs.DeleteAll();
-        //radius = 0.75f;
+        radius = radiusSetter;
         setValuesOnStart();
         GetItSpinning();
     }
@@ -154,10 +155,11 @@ public class PlayerWithGravity : MonoBehaviour {
     void updateRadius() {
         radius = (bodyBeingOrbited.transform.position - gameObject.transform.position).magnitude;
     }
-    public bool RadRadBro() {
-        float idealRadius = ((IPlantCelestialsSC.celestialsQueue.Peek().transform.position - bodyBeingOrbited.transform.position).magnitude) / 2;
-        return Mathf.Abs(idealRadius - radius) < grejtRadiusTreshold;
-    }
+    //public bool RadRadBro() {
+    //    float idealRadius = ((IPlantCelestialsSC.celestialsQueue.Peek().transform.position - bodyBeingOrbited.transform.position).magnitude) / 2;
+        
+    //    return Mathf.Abs(idealRadius - radius) < grejtRadiusTreshold;
+    //}
 
 
     public void FixedUpdate() {        
@@ -177,6 +179,18 @@ public class PlayerWithGravity : MonoBehaviour {
             } else {
                 if (burning) {                                                          //checks if last frame was burning
                     burning = false;
+                    float maxDX, minDX, minDY, maxDY;
+                    maxDX  = maxDY = 0f;
+                    minDX = minDY = 100f;
+                    for (int i = 0; i < nbrOfTrajectoryPoints; i++) {
+                        float deltaX = Mathf.Abs(trajectoryPoints[i].x - trajectoryPoints[(i + 1) % (nbrOfTrajectoryPoints)].x);
+                        float deltaY = Mathf.Abs(trajectoryPoints[i].y - trajectoryPoints[(i + 1) % (nbrOfTrajectoryPoints)].y);
+                        maxDX = (deltaX > maxDX) ? deltaX : maxDX;
+                        minDX = (deltaX < minDX) ? deltaX : minDX;
+                        maxDY = (deltaY > maxDY) ? deltaY : maxDY;
+                        minDY = (deltaY < minDY) ? deltaY : minDY;
+                    }
+                    Debug.Log("maxDX: " + maxDX + ", maxDY: " + maxDY + ", minDX: " + minDX + ", minDY: " + minDY);
                     burnCounter = 0;
                     awatingTransition = true;
                     if (CelestialInsideTrajectory()) {
@@ -190,6 +204,7 @@ public class PlayerWithGravity : MonoBehaviour {
                 Time.timeScale = nrmlTime;
             }
         } else if(!overlordScript.fuckedUp){
+           
             EstablishedNewOrbit(pointOfBurn);
             fuel.value = Mathf.MoveTowards(fuel.value, fuel.minValue, 0.5f);
         }
@@ -292,17 +307,15 @@ public class PlayerWithGravity : MonoBehaviour {
         //Debug.Log(score);
         Vector3 transitionVel = Vector2.zero;
         if (celestialInside) {
-            
             bodyBeingOrbited.tag = "celestial";
             bodyBeingOrbited = successfulCelestial;
+            IPlantCelestialsSC.getCelestialsQueue().Dequeue();
             updateRadius();
-
             satisfactorySoundsSC.PrepareRandom();
             celestialMass = bodyBeingOrbited.GetComponent<celestialScript>().mass;
             bodyBeingOrbited.tag = "orbitingCelestial";
             score++;
             scoreText.text = "" + score;
-            IPlantCelestialsSC.getCelestialsQueue().Dequeue();
             IPlantCelestialsSC.CelestialFactory();
             celestialInside = false;
         }

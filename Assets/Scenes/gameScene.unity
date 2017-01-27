@@ -365,10 +365,10 @@ LineRenderer:
     colorGradient:
       key0:
         serializedVersion: 2
-        rgba: 4278237695
+        rgba: 4294967295
       key1:
         serializedVersion: 2
-        rgba: 4278237695
+        rgba: 4294967295
       key2:
         serializedVersion: 2
         rgba: 0
@@ -461,11 +461,11 @@ MonoBehaviour:
   satisfactorySoundsSC: {fileID: 1266259403}
   HighScoreSC: {fileID: 1209614185}
   retryButton: {fileID: 1564441046}
-  radius: 0.75
-  grejtRadiusTreshold: 0.001
+  radiusSetter: 0.75
+  grejtRadiusTreshold: 0.5
   bodyBeingOrbited: {fileID: 1771550625}
   orbitalPeriod: 0
-  nrmlTime: 6
+  nrmlTime: 5
   trajectoryPoints: []
   simplify: 13
   maxCount: 150
@@ -476,10 +476,10 @@ MonoBehaviour:
   fuel: {fileID: 1828722833}
   firstTimePlaying: 0
   tutorialActive: 0
-  minApoapsis: 0.4238
+  minApoapsis: 0.42
   maxApoapsis: 1.1
   maxBurns: 66
-  minBurns: 26
+  minBurns: 28
   inputPresent: 0
   explosion: {fileID: 1644341650}
 --- !u!1 &203680039
@@ -3950,7 +3950,7 @@ GameObject:
   - component: {fileID: 841098972}
   - component: {fileID: 841098971}
   m_Layer: 5
-  m_Name: 6
+  m_Name: 7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3988,7 +3988,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1.31
-  m_Text: Touch the screen and hold to engage the engines.
+  m_Text: 'Touch the screen and hold to engage the engines. '
 --- !u!222 &841098972
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4006,7 +4006,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1.3930718}
   m_Children: []
   m_Father: {fileID: 1459118240}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4052,6 +4052,7 @@ MonoBehaviour:
   - {fileID: 662843304}
   - {fileID: 1761281791}
   - {fileID: 2089048209}
+  - {fileID: 1552297112}
   - {fileID: 841098971}
   textBackground: {fileID: 1405278656}
   playerWithGravitySC: {fileID: 174055515}
@@ -5123,10 +5124,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 051aa277d918d9d458a314b9bc9b12af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  background: {fileID: 700446482}
   cam: {fileID: 1757907081}
   screenLowerBoundary: 0
-  adInterval: 4
+  adInterval: 10
   menuButtons: {fileID: 1607053544}
   resumeButton: {fileID: 409564652}
   musiken: {fileID: 1757907087}
@@ -5180,7 +5180,7 @@ MonoBehaviour:
   - {fileID: 662435057}
   - {fileID: 1098341528}
   - {fileID: 1474042908}
-  playerWithGravitySC: {fileID: 0}
+  playerWithGravitySC: {fileID: 174055515}
 --- !u!114 &1266259404
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5697,6 +5697,7 @@ RectTransform:
   - {fileID: 662843302}
   - {fileID: 1761281790}
   - {fileID: 2089048211}
+  - {fileID: 1552297114}
   - {fileID: 841098973}
   - {fileID: 1813653891}
   m_Father: {fileID: 1436123975}
@@ -5846,6 +5847,80 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9ce88da78c515344a470409732dcf8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1552297111
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1552297114}
+  - component: {fileID: 1552297113}
+  - component: {fileID: 1552297112}
+  m_Layer: 5
+  m_Name: 6
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1552297112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1552297111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: e1811962c79e65647af3c81b0a0f843e, type: 3}
+    m_FontSize: 21
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 13
+    m_MaxSize: 205
+    m_Alignment: 4
+    m_AlignByGeometry: 1
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1.31
+  m_Text: Stop the engines when you've encircled the planet above with your trajectory.
+--- !u!222 &1552297113
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1552297111}
+--- !u!224 &1552297114
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1552297111}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1.3930726}
+  m_Children: []
+  m_Father: {fileID: 1459118240}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 451, y: 60}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1564441046
 GameObject:
   m_ObjectHideFlags: 0
@@ -9089,7 +9164,7 @@ RectTransform:
   m_Children:
   - {fileID: 203680040}
   m_Father: {fileID: 1459118240}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}

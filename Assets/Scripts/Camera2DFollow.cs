@@ -7,7 +7,7 @@ public class Camera2DFollow : MonoBehaviour {
     public RawImage retryBG;
     private Color retryColor;
     private Color antiRetryColor;
-    private Camera cam;
+
 
     public PlayerWithGravity playerWithGravitySC;
 
@@ -35,7 +35,7 @@ public class Camera2DFollow : MonoBehaviour {
     // Use this for initialization
     private void Start() {
         
-        cam = GetComponent<Camera>();
+    
         retryColor = new Color(0, 0, 0, 0.2f);
         antiRetryColor = new Color(0, 0, 0, 0);
         SetTarget(GameObject.Find("StartCelestial").transform.position);

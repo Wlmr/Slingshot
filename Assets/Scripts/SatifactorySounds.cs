@@ -10,27 +10,26 @@ public class SatifactorySounds : MonoBehaviour, AudioProcessor.AudioCallbacks {
     public AudioSource[] players;
     private bool awaitingBeat;
     public PlayerWithGravity playerWithGravitySC;
-    private IPlantCelestials iPlantCelestialsSC;
 
     // Use this for initialization
     void Start () {
-        iPlantCelestialsSC = GetComponent<IPlantCelestials>();
+    
         awaitingBeat = false;
         processor.addAudioCallback(this);
     }
 
     public void PrepareRandom() {
-        if (playerWithGravitySC.RadRadBro()) {
+        //if (playerWithGravitySC.RadRadBro()) {
             for (int i = 0; i < 3; i++) {
                 players[i].clip = toner[UnityEngine.Random.Range(0, 15)];
                 players[i].Play();
             }
             awaitingBeat = true;
-        }
+        //}
     }
 
     public void onOnbeatDetected() {
-        if (awaitingBeat && playerWithGravitySC.RadRadBro()) {
+        if (awaitingBeat ) {
             for (int i = 0; i < 3; i++) {
                players[i].Play();
             }

@@ -6,7 +6,6 @@ using UnityEngine.Advertisements;
 
 public class overlordScript : MonoBehaviour {
 
-    public Transform background;
     public Camera cam;
     public float screenLowerBoundary;
     //public int universeSpeed;
@@ -28,7 +27,7 @@ public class overlordScript : MonoBehaviour {
     
 
     void Start() {
-        Debug.Log(PlayerPrefs.GetInt("restarted"));
+       // Debug.Log(PlayerPrefs.GetInt("restarted"));
         if (adIntervalPrivate == 0) adIntervalPrivate = Random.Range(adInterval - 2, adInterval + 2);
         CheckForRestart();
         fuckedUp = false;
@@ -38,15 +37,26 @@ public class overlordScript : MonoBehaviour {
     }
 
 
+    
+
+    private void HighScoreSetup() {
+
+    }
+
+    public void ActivateMenu(bool boolean) {
+        menuButtons.SetActive(boolean);
+    }
+
+
     public void Crash(bool highScore, bool reviveable) {
         fuckedUp = true;
         crashCounter++;
-       // Debug.Log("crashes: " + crashCounter);
+        // Debug.Log("crashes: " + crashCounter);
         ActivateMenu(true);
         if (highScore) {
             HighScoreSC.CongratulateNewHighScore(true);
         }
-        if (reviveable && crashCounter % (adIntervalPrivate/2) == 0) {
+        if (reviveable && crashCounter % (adIntervalPrivate / 2) == 0) {
             revive.gameObject.SetActive(true);
             if (NoPlayerPrefsKey("notFirstRevive")) {
                 reviveExp.SetActive(true);
@@ -65,17 +75,9 @@ public class overlordScript : MonoBehaviour {
         revive.gameObject.SetActive(false);
         reviveExp.SetActive(false);
         HighScoreSC.CongratulateNewHighScore(false);
+        PlayerPrefs.SetInt("restarted", 1);
     }
 
-    private void HighScoreSetup() {
-
-    }
-
-    public void ActivateMenu(bool boolean) {
-        menuButtons.SetActive(boolean);
-    }
-
-   
     public void ShowRewardedAd() {
         if (Advertisement.IsReady("rewardedVideo")) {
             var options = new ShowOptions { resultCallback = HandleShowResult };
@@ -108,7 +110,6 @@ public void showAd() {
     }
     
     void FixedUpdate() {
-        //background.Rotate(Vector3.forward / 30);   
         screenLowerBoundary = cam.ScreenToWorldPoint(new Vector2(0, 0)).y;
     }
 
@@ -141,7 +142,7 @@ public void showAd() {
 
     public void Resume() {
         PlayerPrefs.SetInt("restarted", 1);
-        Time.timeScale = 6;                         //should be set dynamically
+        Time.timeScale = playerWithGravitySC.nrmlTime;
         fuckedUp = false;
         resumeButton.SetActive(false);
     }
@@ -150,10 +151,12 @@ public void showAd() {
         if (pauseStatus && PlayerWithGravity.startCamMovment) {
             PlayerPrefs.SetInt("restarted", 0);
             PlayerPrefs.Save();
-            if ( !fuckedUp) {
+            if (!fuckedUp) {
                 resumeButton.SetActive(true);
                 Time.timeScale = 0;
                 fuckedUp = true;
+            }else {
+                PlayerPrefs.SetInt("restarted", 1);
             }
         }
         //Debug.Log("quitted");
