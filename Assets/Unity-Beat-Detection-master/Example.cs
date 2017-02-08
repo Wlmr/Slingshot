@@ -42,7 +42,7 @@ public class Example : MonoBehaviour, AudioProcessor.AudioCallbacks
     //to adjust the sensitivity
     public void onOnbeatDetected()
     {
-        Debug.Log("Beat!!!");
+       // Debug.Log("Beat!!!");
     }
 
     //This event will be called every frame while music is playing

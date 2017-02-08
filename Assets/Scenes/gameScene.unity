@@ -465,7 +465,7 @@ MonoBehaviour:
   grejtRadiusTreshold: 0.5
   bodyBeingOrbited: {fileID: 1771550625}
   orbitalPeriod: 0
-  nrmlTime: 5
+  nrmlTime: 0
   trajectoryPoints: []
   simplify: 13
   maxCount: 150
@@ -479,7 +479,7 @@ MonoBehaviour:
   minApoapsis: 0.42
   maxApoapsis: 1.1
   maxBurns: 66
-  minBurns: 28
+  minBurns: 30
   inputPresent: 0
   explosion: {fileID: 1644341650}
 --- !u!1 &203680039
@@ -1009,7 +1009,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 0.602
   m_Pitch: 1
   Loop: 0
@@ -1234,7 +1234,7 @@ ParticleSystemRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_SelectedEditorRenderState: 3
+  m_SelectedEditorRenderState: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -1514,15 +1514,9 @@ ParticleSystem:
           inSlope: 0
           outSlope: 0
           tangentMode: 0
-        - serializedVersion: 2
-          time: 1
-          value: 1
-          inSlope: 0
-          outSlope: 0
-          tangentMode: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
-        m_RotationOrder: 4
+        m_RotationOrder: 0
       minCurve:
         serializedVersion: 2
         m_Curve:
@@ -1532,16 +1526,10 @@ ParticleSystem:
           inSlope: 0
           outSlope: 0
           tangentMode: 0
-        - serializedVersion: 2
-          time: 1
-          value: 0
-          inSlope: 0
-          outSlope: 0
-          tangentMode: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
-        m_RotationOrder: 4
-      minMaxState: 0
+        m_RotationOrder: 0
+      minMaxState: 3
     startSizeZ:
       scalar: 1
       maxCurve:
@@ -1553,15 +1541,9 @@ ParticleSystem:
           inSlope: 0
           outSlope: 0
           tangentMode: 0
-        - serializedVersion: 2
-          time: 1
-          value: 1
-          inSlope: 0
-          outSlope: 0
-          tangentMode: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
-        m_RotationOrder: 4
+        m_RotationOrder: 0
       minCurve:
         serializedVersion: 2
         m_Curve:
@@ -1571,16 +1553,10 @@ ParticleSystem:
           inSlope: 0
           outSlope: 0
           tangentMode: 0
-        - serializedVersion: 2
-          time: 1
-          value: 0
-          inSlope: 0
-          outSlope: 0
-          tangentMode: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
-        m_RotationOrder: 4
-      minMaxState: 0
+        m_RotationOrder: 0
+      minMaxState: 3
     startRotationX:
       scalar: 0
       maxCurve:
@@ -4583,7 +4559,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 0.602
   m_Pitch: 1
   Loop: 0
@@ -5159,7 +5135,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71f858648dc20934bbdb27ebda968d0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  processor: {fileID: 1757907086}
   toner:
   - {fileID: 8300000, guid: ac7fb26d150d3b44a80db1e5bee4eebd, type: 3}
   - {fileID: 8300000, guid: 11bd8951bd167ff4dad70fd16dde1f48, type: 3}
@@ -5896,7 +5871,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1.31
-  m_Text: Stop the engines when you've encircled the planet above with your trajectory.
+  m_Text: Stop the engines when you've encircled the planet above with your trajectory...
 --- !u!222 &1552297113
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6218,7 +6193,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: 1771445230
+  randomSeed: 1829027068
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -8820,7 +8795,6 @@ GameObject:
   - component: {fileID: 1757907084}
   - component: {fileID: 1757907085}
   - component: {fileID: 1757907087}
-  - component: {fileID: 1757907086}
   - component: {fileID: 1757907088}
   m_Layer: 0
   m_Name: Main Camera
@@ -8951,19 +8925,6 @@ MonoBehaviour:
   m_EventMask:
     serializedVersion: 2
     m_Bits: 1024
---- !u!114 &1757907086
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1757907077}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee86dc5989beb934d93bb32dd270d3ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bufferSize: 1024
-  gThresh: 0.1
 --- !u!82 &1757907087
 AudioSource:
   m_ObjectHideFlags: 0

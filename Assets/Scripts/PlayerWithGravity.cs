@@ -143,7 +143,7 @@ public class PlayerWithGravity : MonoBehaviour {
     }
 
     public void GetItSpinning() {
-        nrmlTime = 6.0F;
+        nrmlTime = 6;
         transform.localPosition = new Vector2(bodyBeingOrbited.transform.position.x, bodyBeingOrbited.transform.position.y + radius); //putting the spaceship in place
         playerRigidbody.velocity = speed;                                                                                               //adding the speed
         Time.timeScale = nrmlTime;                                                                                                      //speeding up time so that updating the trajectory path run smoothly
@@ -190,7 +190,7 @@ public class PlayerWithGravity : MonoBehaviour {
                         maxDY = (deltaY > maxDY) ? deltaY : maxDY;
                         minDY = (deltaY < minDY) ? deltaY : minDY;
                     }
-                    Debug.Log("maxDX: " + maxDX + ", maxDY: " + maxDY + ", minDX: " + minDX + ", minDY: " + minDY);
+                    //Debug.Log("maxDX: " + maxDX + ", maxDY: " + maxDY + ", minDX: " + minDX + ", minDY: " + minDY);
                     burnCounter = 0;
                     awatingTransition = true;
                     if (CelestialInsideTrajectory()) {
@@ -338,7 +338,17 @@ public class PlayerWithGravity : MonoBehaviour {
             bool a, b, c, d;                                                            //switches so that each statement only can be true once
             a = b = c = d = true;
             for (int j = 0; j < nbrOfTrajectoryPoints; j++) {
-                if (Mathf.Abs(trajectoryPoints[j].y - celestialPos.y) < threshold) {
+            int behindJ = j+nbrOfTrajectoryPoints - 1;
+            int infrontJ = j+nbrOfTrajectoryPoints + 1; 
+            float deltaX1 = Mathf.Abs(trajectoryPoints[j].x - trajectoryPoints[infrontJ%(nbrOfTrajectoryPoints)].x);
+            float deltaY1 = Mathf.Abs(trajectoryPoints[j].y - trajectoryPoints[infrontJ%(nbrOfTrajectoryPoints)].y);
+            float deltaX2 = Mathf.Abs(trajectoryPoints[j].x - trajectoryPoints[behindJ%(nbrOfTrajectoryPoints)].x); 
+            float deltaY2 = Mathf.Abs(trajectoryPoints[j].y - trajectoryPoints[behindJ%(nbrOfTrajectoryPoints)].y);
+            float shorterDX = deltaX1 < deltaX2 ? deltaX1 : deltaX2;
+            float longerDX = deltaX1 > deltaX2 ? deltaX1 : deltaX2;
+            float shorterDY = deltaY1 < deltaY2 ? deltaY1 : deltaY2;
+            float longerDY = deltaY1 > deltaY2 ? deltaY1 : deltaY2;
+            if (Mathf.Abs(trajectoryPoints[j].y - celestialPos.y) <= shorterDY/2 || Mathf.Abs(trajectoryPoints[j].y - celestialPos.y) <  longerDY/2) {
                     if (trajectoryPoints[j].x > celestialPos.x && a) {
                         i++;
                         a = false;
@@ -346,7 +356,7 @@ public class PlayerWithGravity : MonoBehaviour {
                         i++;
                         b = false;
                     }
-                } else if (Mathf.Abs(trajectoryPoints[j].x - celestialPos.x) < threshold) {
+                } else if (Mathf.Abs(trajectoryPoints[j].x - celestialPos.x) <= shorterDX/2 || Mathf.Abs(trajectoryPoints[j].x - celestialPos.x) < longerDX/ 2) {
                     if (trajectoryPoints[j].y > celestialPos.y && c) {
                         i++;
                         c = false;
@@ -356,22 +366,16 @@ public class PlayerWithGravity : MonoBehaviour {
                     }
                 }
             }
-            if (i == 4) {
-                
-               // oldCelestial = bodyBeingOrbited;
-                successfulCelestial = IPlantCelestialsSC.getCelestialsQueue().Peek();
-                camera2DFollowSC.SetTarget(successfulCelestial.transform.position);
-                camera2DFollowSC.SpeedIncrease();
-                celestialInside = true;
-                
-                return true;
-            } else {
-                //Debug.Log(celestialPos);
-                //Debug.Log("i: "+ i + ", a: " + a + ", b: " + b + ", c: " + c + ", d: " + d);
-
-                i = 0;
-            }
-        //}
+        Debug.Log("i: " + i + ", a: " + a + ", b: " + b + ", c: " + c + ", d: " + d);
+        if (i == 4) {
+            successfulCelestial = IPlantCelestialsSC.getCelestialsQueue().Peek();
+            camera2DFollowSC.SetTarget(successfulCelestial.transform.position);
+            camera2DFollowSC.SpeedIncrease();
+            celestialInside = true;
+            return true;
+        } else {
+            i = 0;
+        }
         return false;
     }
     

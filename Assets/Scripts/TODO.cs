@@ -13,5 +13,6 @@ public class TODO : MonoBehaviour {
 - [ ]   Write awake in overlord with PlayerPrefs
 - [x]   "resume trying button" only when playing
 - [x]   make sure minburn maxburn etc works as it should
+- [x]   make CelestialInside() check LONGEST? of the two surrounding vectorss 
     */
 }

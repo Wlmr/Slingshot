@@ -5,7 +5,7 @@ using System;
 
 public class SatifactorySounds : MonoBehaviour, AudioProcessor.AudioCallbacks {
 
-    public AudioProcessor processor;
+   // public AudioProcessor processor;
     public AudioClip[] toner;
     public AudioSource[] players;
     private bool awaitingBeat;
@@ -15,7 +15,7 @@ public class SatifactorySounds : MonoBehaviour, AudioProcessor.AudioCallbacks {
     void Start () {
     
         awaitingBeat = false;
-        processor.addAudioCallback(this);
+     //   processor.addAudioCallback(this);
     }
 
     public void PrepareRandom() {
