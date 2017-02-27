@@ -43,7 +43,7 @@ public class PlayerWithGravity : MonoBehaviour {
 
     //for DotifyTrajectory()
     public Vector3[] trajectoryPoints;
-    public int simplify;
+    private int simplify;
     public int maxCount;
     private float playerWeight;
     private int nbrOfTrajectoryPoints;
@@ -339,33 +339,40 @@ public class PlayerWithGravity : MonoBehaviour {
             a = b = c = d = true;
             for (int j = 0; j < nbrOfTrajectoryPoints; j++) {
             int behindJ = j+nbrOfTrajectoryPoints - 1;
-            int infrontJ = j+nbrOfTrajectoryPoints + 1; 
-            float deltaX1 = Mathf.Abs(trajectoryPoints[j].x - trajectoryPoints[infrontJ%(nbrOfTrajectoryPoints)].x);
-            float deltaY1 = Mathf.Abs(trajectoryPoints[j].y - trajectoryPoints[infrontJ%(nbrOfTrajectoryPoints)].y);
-            float deltaX2 = Mathf.Abs(trajectoryPoints[j].x - trajectoryPoints[behindJ%(nbrOfTrajectoryPoints)].x); 
-            float deltaY2 = Mathf.Abs(trajectoryPoints[j].y - trajectoryPoints[behindJ%(nbrOfTrajectoryPoints)].y);
-            float shorterDX = deltaX1 < deltaX2 ? deltaX1 : deltaX2;
-            float longerDX = deltaX1 > deltaX2 ? deltaX1 : deltaX2;
-            float shorterDY = deltaY1 < deltaY2 ? deltaY1 : deltaY2;
-            float longerDY = deltaY1 > deltaY2 ? deltaY1 : deltaY2;
-            if (Mathf.Abs(trajectoryPoints[j].y - celestialPos.y) <= shorterDY/2 || Mathf.Abs(trajectoryPoints[j].y - celestialPos.y) <  longerDY/2) {
-                    if (trajectoryPoints[j].x > celestialPos.x && a) {
-                        i++;
-                        a = false;
-                    } else if (trajectoryPoints[j].x < celestialPos.x && b) {
-                        i++;
-                        b = false;
-                    }
-                } else if (Mathf.Abs(trajectoryPoints[j].x - celestialPos.x) <= shorterDX/2 || Mathf.Abs(trajectoryPoints[j].x - celestialPos.x) < longerDX/ 2) {
-                    if (trajectoryPoints[j].y > celestialPos.y && c) {
-                        i++;
-                        c = false;
-                    } else if(trajectoryPoints[j].y < celestialPos.y && d) {
-                        i++;
-                        d = false;
-                    }
+            int infrontJ = j+nbrOfTrajectoryPoints + 1;
+            Vector2 behindJVector = trajectoryPoints[behindJ % (nbrOfTrajectoryPoints)] - trajectoryPoints[j];
+            Vector2 infronJVector = trajectoryPoints[infrontJ % (nbrOfTrajectoryPoints)] - trajectoryPoints[j];
+
+
+            float deltaXInfront = Mathf.Abs(trajectoryPoints[j].x - trajectoryPoints[infrontJ%(nbrOfTrajectoryPoints)].x);
+            float deltaYInfront = Mathf.Abs(trajectoryPoints[j].y - trajectoryPoints[infrontJ%(nbrOfTrajectoryPoints)].y);
+            float deltaXBehind = Mathf.Abs(trajectoryPoints[j].x - trajectoryPoints[behindJ%(nbrOfTrajectoryPoints)].x); 
+            float deltaYBehind = Mathf.Abs(trajectoryPoints[j].y - trajectoryPoints[behindJ%(nbrOfTrajectoryPoints)].y);
+
+
+            float shorterDX = deltaXInfront < deltaXBehind ? deltaXInfront : deltaXBehind;
+            float longerDX = deltaXInfront > deltaXBehind ? deltaXInfront : deltaXBehind;
+            float shorterDY = deltaYInfront < deltaYBehind ? deltaYInfront : deltaYBehind;
+            float longerDY = deltaYInfront > deltaYBehind ? deltaYInfront : deltaYBehind;
+            
+            if (Mathf.Abs(trajectoryPoints[j].y - celestialPos.y) <= shorterDY/2 || Mathf.Abs(trajectoryPoints[j].y - celestialPos.y) <=  longerDY/2) {
+                if (trajectoryPoints[j].x > celestialPos.x && a) {
+                    i++;
+                    a = false;
+                } else if (trajectoryPoints[j].x < celestialPos.x && b) {
+                    i++;
+                    b = false;
+                }
+            } else if (Mathf.Abs(trajectoryPoints[j].x - celestialPos.x) <= shorterDX/2 || Mathf.Abs(trajectoryPoints[j].x - celestialPos.x) <= longerDX/ 2) {
+                if (trajectoryPoints[j].y > celestialPos.y && c) {
+                    i++;
+                    c = false;
+                } else if(trajectoryPoints[j].y < celestialPos.y && d) {
+                    i++;
+                    d = false;
                 }
             }
+        }
         Debug.Log("i: " + i + ", a: " + a + ", b: " + b + ", c: " + c + ", d: " + d);
         if (i == 4) {
             successfulCelestial = IPlantCelestialsSC.getCelestialsQueue().Peek();
@@ -378,26 +385,33 @@ public class PlayerWithGravity : MonoBehaviour {
         }
         return false;
     }
-    
+
     void DotifyTrjctry() {
-            speed = playerRigidbody.velocity;
-            trajectoryPoints = new Vector3[privateMaxCount];
-            s = transform.position;
-            v = speed / 10;
-            a = GetGravity(s);
-            step = 0;
-            while (step < (privateMaxCount * simplify)) {
-                if (step % simplify == 0) {
-                    trajectoryPoints[step / simplify] = s;
-                }
-                a = GetGravity(s);
-                v += a * dt;
-                s += v * dt;
-                step++;
+        speed = playerRigidbody.velocity;
+        trajectoryPoints = new Vector3[privateMaxCount];
+        simplify = (int) Mathf.Lerp(5, 10, Mathf.Sqrt(radius - minApoapsis) / Mathf.Sqrt(maxApoapsis - minApoapsis));
+        s = transform.position;
+        v = speed / 10;
+        a = GetGravity(s);
+        step = 0;
+        float angle = 0;
+        Vector2 last = s - bodyBeingOrbited.transform.position;
+
+        while (step < (privateMaxCount * simplify) && angle <= 370) {
+            if (step % simplify == 0) {
+                trajectoryPoints[step / simplify] = s;
             }
-            nbrOfTrajectoryPoints = step / simplify;
-            trajectoryLine.numPositions = nbrOfTrajectoryPoints;
-            trajectoryLine.SetPositions(trajectoryPoints);    
+            a = GetGravity(s);
+            v += a * dt;
+            s += v * dt;
+            angle += Vector2.Angle(last, s - bodyBeingOrbited.transform.position);
+            last = s - bodyBeingOrbited.transform.position;
+            step++;
         }
+        nbrOfTrajectoryPoints = (step / simplify);
+        trajectoryPoints[nbrOfTrajectoryPoints] = trajectoryPoints[0];
+        trajectoryLine.numPositions = nbrOfTrajectoryPoints+1;
+        trajectoryLine.SetPositions(trajectoryPoints);  
     }
+}
     

@@ -467,8 +467,7 @@ MonoBehaviour:
   orbitalPeriod: 0
   nrmlTime: 0
   trajectoryPoints: []
-  simplify: 13
-  maxCount: 150
+  maxCount: 400
   oldCelestial: {fileID: 0}
   threshold: 0.2
   scoreText: {fileID: 882804774}

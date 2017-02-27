@@ -24,14 +24,17 @@ public class overlordScript : MonoBehaviour {
     public Button revive;
     public GameObject reviveExp;
 
+    private int restarted;
     
 
     void Start() {
-       // Debug.Log(PlayerPrefs.GetInt("restarted"));
+        restarted = PlayerPrefs.GetInt("restarted");
+        Debug.Log(PlayerPrefs.GetInt("restarted"));
         if (adIntervalPrivate == 0) adIntervalPrivate = Random.Range(adInterval - 2, adInterval + 2);
         CheckForRestart();
         fuckedUp = false;
         showAd();
+        
 
 
     }
@@ -122,7 +125,7 @@ public void showAd() {
     }
 
     public bool NoPlayerPrefsKey(string key) {
-        return (PlayerPrefs.GetInt(key) == 0 || !PlayerPrefs.HasKey(key));
+        return (!PlayerPrefs.HasKey(key)||PlayerPrefs.GetInt(key) == 0 );
     }
 
     public void PlayButton (){
@@ -155,11 +158,18 @@ public void showAd() {
                 resumeButton.SetActive(true);
                 Time.timeScale = 0;
                 fuckedUp = true;
-            }else {
-                PlayerPrefs.SetInt("restarted", 1);
             }
+        } else if (pauseStatus) {
+            PlayerPrefs.SetInt("restarted", 1);
+        }else if(!pauseStatus) {
+            PlayerPrefs.SetInt("restarted", 1);
         }
-        //Debug.Log("quitted");
     }
+
+    void OnApplicationQuit() {
+        PlayerPrefs.SetInt("restarted", 0);
+    }
+        //Debug.Log("quitted");
 }
+
 
